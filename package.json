@@ -1,0 +1,21 @@
+{
+    "name": "game-test",
+    "version": "0.0.1",
+    "description": "start of the journey",
+    "main": "index.js",
+    "scripts": {
+        "start": "npx webpack-dev-server --open --config ./build-config/webpack-dev.js",
+        "build:prod": "npx webpack -p --config ./build-config/webpack-common.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {},
+    "devDependencies": {
+        "copy-webpack-plugin": "^5.0.0",
+        "webpack": "^4.29.5",
+        "webpack-cli": "^3.2.3",
+        "webpack-dev-server": "^3.2.0",
+        "webpack-merge": "^4.2.1"
+    }
+}
