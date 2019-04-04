@@ -12,7 +12,8 @@ export class LoadScene extends Phaser.Scene {
     preload() {
         this.load.atlas("slimeg", "assets/slimeg.png", "assets/slimeg.json");
         this.load.image("tiles", "assets/sewer_tileset.png");
-        this.load.tilemapTiledJSON("map", "assets/sewers.json");
+        // this.load.tilemapTiledJSON("map", "assets/sewers.json");
+        this.load.tilemapTiledJSON("map", "assets/sewersObjects.json");
 
         let loadingBar = this.add.graphics({
             fillStyle: {

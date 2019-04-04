@@ -1,5 +1,5 @@
 import { CST } from "../CST";
-
+// Great that this exists https://www.youtube.com/watch?v=55DzXMkCfVA
 export class MenuScene extends Phaser.Scene {
     constructor() {
         super({
