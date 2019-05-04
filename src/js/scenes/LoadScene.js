@@ -1,4 +1,4 @@
-import { CST } from "../CST";
+import { CST } from "../constants/CST";
 
 export class LoadScene extends Phaser.Scene {
     constructor() {
@@ -10,10 +10,13 @@ export class LoadScene extends Phaser.Scene {
     init() {}
 
     preload() {
-        this.load.atlas("slimeg", "assets/slimeg.png", "assets/slimeg.json");
-        this.load.image("tiles", "assets/sewer_tileset.png");
-        // this.load.tilemapTiledJSON("map", "assets/sewers.json");
-        this.load.tilemapTiledJSON("map", "assets/sewersObjects.json");
+        this.load.atlas(
+            "slimeg",
+            "assets/atlas/slimeg.png",
+            "assets/atlas/slimeg.json"
+        );
+        this.load.image("tiles", "assets/levels/sewer_tileset.png");
+        this.load.tilemapTiledJSON("map", "assets/levels/sewersObjects.json");
 
         let loadingBar = this.add.graphics({
             fillStyle: {
