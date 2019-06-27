@@ -26,26 +26,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
-        if (this.keyboard.D.isDown === true) {
-            this.slime.setVelocityX(100);
-            this.slime.flipX = true;
-            this.slime.anims.play("walk", true);
-        }
-        if (this.keyboard.A.isDown === true) {
-            this.slime.setVelocityX(-100);
-            this.slime.flipX = false;
-            this.slime.anims.play("walk", true);
-        }
-        if (this.keyboard.W.isDown === true) {
-            this.slime.setVelocityY(-140);
-            this.slime.anims.stop();
-        }
-
-        if (!this.keyboard.A.isDown && !this.keyboard.D.isDown) {
-            this.slime.setVelocityX(0);
-            this.slime.anims.play("stand", true);
-        }
-
         this.stateMachine.update();
     }
 
@@ -99,27 +79,92 @@ export class GameScene extends Phaser.Scene {
         const sm = new StateMachine();
         sm.state("standing", {
             enter: () => {
-                this.help.setText("standing");
+                this.slime.setVelocityX(0);
+                this.slime.anims.play("stand", true);
             },
             update: function() {},
             exit: function() {}
         });
 
-        sm.state("walking", {
+        sm.state("walking_left", {
             enter: () => {
-                this.help.setText("walking");
+                this.slime.anims.play("walk", true);
+                this.slime.flipX = false;
+                this.slime.setVelocityX(-100);
             },
-            update: function() {},
-            exit: function() {}
+            update: () => {
+            },
+            exit: () => {
+            }
         });
 
-        // walkin
-        sm.transition("walking_to_standing", "walking", "standing", () => {
-            return !this.keyboard.A.isDown && new Date() - sm.timer > 1000;
+        sm.state("walking_right", {
+            enter: () => {
+                this.slime.anims.play("walk", true);
+                this.slime.flipX = true;
+                this.slime.setVelocityX(100);
+            },
+            update: () => {
+            },
+            exit: () => {
+            }
         });
 
-        sm.transition("standing_to_walking", "standing", "walking", () => {
-            return this.keyboard.A.isDown && new Date() - sm.timer > 1000;
+        sm.state("jumping", {
+            enter: () => {
+                this.slime.setVelocity(this.slime.body.velocity.x, -140);
+
+                this.slime.anims.stop();
+            },
+            update: () => {
+            },
+            exit: () => {
+            }
+        });
+
+        // walkin left
+        sm.transition("walking_left_to_standing", "walking_left", "standing", () => {
+            return this.slime.body.onFloor() && !this.keyboard.A.isDown && new Date() - sm.timer > 200;
+        });
+
+        sm.transition("standing_to_walking_left", "standing", "walking_left", () => {
+            return this.slime.body.onFloor() && this.keyboard.A.isDown && new Date() - sm.timer > 100;
+        });
+
+        //waliking right
+        sm.transition("walking_right_to_standing", "walking_right", "standing", () => {
+            return this.slime.body.onFloor() && !this.keyboard.D.isDown && new Date() - sm.timer > 200;
+        });
+
+        sm.transition("standing_to_walking_right", "standing", "walking_right", () => {
+            return this.slime.body.onFloor() && this.keyboard.D.isDown && new Date() - sm.timer > 100;
+        });
+
+        //Jump
+
+        const jumpFunction = () => {
+            return this.slime.body.onFloor() && this.keyboard.W.isDown && this.slime.body.velocity.y == 0;
+        };
+
+        sm.transition("standing_to_jumping", "standing", "jumping", jumpFunction);
+
+        sm.transition("walking_right_to_jumping", "walking_right", "jumping", jumpFunction);
+
+        sm.transition("walking_left_to_jumping", "walking_left", "jumping", jumpFunction);
+
+        // landing
+        sm.transition("jumping_to_standing", "jumping", "standing", () => {
+            return this.slime.body.onFloor() && this.slime.body.velocity.y == 0 && !(this.keyboard.D.isDown || this.keyboard.A.isDown);
+        });
+
+        sm.transition("jumping_to_walking_right", "jumping", "walking_right", () => {
+            return this.slime.body.onFloor()  && this.slime.body.velocity.y == 0
+            && this.keyboard.D.isDown;
+        });
+
+        sm.transition("jumping_to_walking_left", "jumping", "walking_left", () => {
+            return this.slime.body.onFloor()  && this.slime.body.velocity.y == 0
+            && this.keyboard.A.isDown;
         });
 
         this.stateMachine = sm;
