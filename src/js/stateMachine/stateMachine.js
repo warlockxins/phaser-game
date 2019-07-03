@@ -1,18 +1,18 @@
 // modified from https://github.com/drhayes/impactjs-statemachine
-export const StateMachine = function(entity) {
-    this.unnamedTransitionCounter = 0;
+export class StateMachine {
+    constructor(entity) {
+        this.entity = entity;
 
-    this.entity = entity;
+        this.states = {};
+        this.transitions = {};
+        // Track states by name.
+        this.initialState = null;
+        this.currentState = null;
+        this.previousState = null;
+        this.timer = null;
+    }
 
-    this.states = {};
-    this.transitions = {};
-    // Track states by name.
-    this.initialState = null;
-    this.currentState = null;
-    this.previousState = null;
-    this.timer = null;
-
-    this.state = function(name, definition) {
+    state(name, definition) {
         if (!definition) {
             return this.states[name];
         }
@@ -20,9 +20,9 @@ export const StateMachine = function(entity) {
         if (!this.initialState) {
             this.initialState = name;
         }
-    };
+    }
 
-    this.transition = function(name, fromState, toState, predicate) {
+    transition(name, fromState, toState, predicate) {
         if (!fromState && !toState && !predicate) {
             return this.transitions[name];
         }
@@ -31,8 +31,6 @@ export const StateMachine = function(entity) {
             predicate = toState;
             toState = fromState;
             fromState = name;
-            name = "transition-" + this.unnamedTransitionCounter;
-            this.unnamedTransitionCounter += 1;
         }
         if (!this.states[fromState]) {
             throw new Error("Missing from state: " + fromState);
@@ -48,35 +46,21 @@ export const StateMachine = function(entity) {
         };
         this.transitions[name] = transition;
         return transition;
-    };
+    }
 
-    this.update = function() {
+    update() {
         if (!this.currentState) {
             this.currentState = this.initialState;
         }
         var state = this.state(this.currentState);
 
         if (this.previousState !== this.currentState) {
-            if (this.lastTransition) {
-                // this.entity.animations.play( this.lastTransition.name );
-            }
-
             if (state.enter) {
                 this.timer = new Date();
                 state.enter(this.lastTransition);
             }
             this.previousState = this.currentState;
         }
-
-        // // Verify the transitional animation has completed before entering update()
-        // if( this.lastTransition &&
-        //     ( this.entity.animations.currentAnim.name == this.lastTransition.name && this.entity.animations.currentAnim.isPlaying ) ){
-        //   return;
-        // }
-
-        // if( this.entity.animations.currentAnim.name != this.currentState ){
-        //   this.entity.animations.play( this.currentState );
-        // }
 
         if (state.update) {
             state.update();
@@ -96,5 +80,5 @@ export const StateMachine = function(entity) {
                 return;
             }
         }
-    };
-};
+    }
+}
