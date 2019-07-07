@@ -18,7 +18,6 @@ export class GameScene extends Phaser.Scene {
     create() {
         this.addLevel();
         this.addSlimeAnimation();
-        this.setupControls();
         this.setupPhysics();
     }
 
@@ -39,14 +38,6 @@ export class GameScene extends Phaser.Scene {
 
         this.cameras.main.startFollow(this.slime);
     }
-    setupControls() {
-        this.cameras.main.setBounds(
-            0,
-            0,
-            this.map.widthInPixels,
-            this.map.heightInPixels
-        );
-    }
 
     addLevel() {
         this.map = this.add.tilemap("map");
@@ -61,5 +52,12 @@ export class GameScene extends Phaser.Scene {
         this.topLayer = this.map
             .createStaticLayer("Top", [tiles], 0, 0)
             .setDepth(-1);
+
+        this.cameras.main.setBounds(
+            0,
+            0,
+            this.map.widthInPixels,
+            this.map.heightInPixels
+        );
     }
 }

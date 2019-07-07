@@ -1,8 +1,6 @@
 // modified from https://github.com/drhayes/impactjs-statemachine
 export class StateMachine {
-    constructor(entity) {
-        this.entity = entity;
-
+    constructor() {
         this.states = {};
         this.transitions = {};
         // Track states by name.
@@ -19,6 +17,7 @@ export class StateMachine {
         this.states[name] = definition;
         if (!this.initialState) {
             this.initialState = name;
+            this.currentState = name;
         }
     }
 
@@ -38,7 +37,7 @@ export class StateMachine {
         if (!this.states[toState]) {
             throw new Error("Missing to state: " + toState);
         }
-        var transition = {
+        const transition = {
             name: name,
             fromState: fromState,
             toState: toState,
@@ -49,10 +48,7 @@ export class StateMachine {
     }
 
     update() {
-        if (!this.currentState) {
-            this.currentState = this.initialState;
-        }
-        var state = this.state(this.currentState);
+        const state = this.states[this.currentState];
 
         if (this.previousState !== this.currentState) {
             if (state.enter) {
@@ -66,8 +62,8 @@ export class StateMachine {
             state.update();
         }
         // Iterate through transitions.
-        for (var name in this.transitions) {
-            var transition = this.transitions[name];
+        for (let name in this.transitions) {
+            const transition = this.transitions[name];
             if (
                 transition.fromState === this.currentState &&
                 transition.predicate()

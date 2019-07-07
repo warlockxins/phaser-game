@@ -7,8 +7,23 @@ export class SlimegCharacterSprite extends CharacterSprite {
         const frame = "slime1.png";
         super(scene, x, y, texture, frame);
 
+        scene.physics.world.enableBody(this);
+
         this.keyboard = keyboard;
+
+        this.move = {
+            left: false,
+            right: false,
+            up: false
+        };
+
         this.createStateMachine();
+    }
+
+    keysTostate() {
+        this.move.left = this.keyboard.A.isDown;
+        this.move.right = this.keyboard.D.isDown;
+        this.move.up = this.keyboard.W.isDown;
     }
 
     createStateMachine() {
@@ -53,6 +68,14 @@ export class SlimegCharacterSprite extends CharacterSprite {
             exit: () => {}
         });
 
+        sm.state("falling", {
+            enter: () => {
+                //temp
+                this.anims.play("stand", true);
+            },
+            update: () => {},
+            exit: () => {}
+        });
         // walkin left
         sm.transition(
             "walking_left_to_standing",
@@ -61,7 +84,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
             () => {
                 return (
                     this.body.onFloor() &&
-                    !this.keyboard.A.isDown &&
+                    !this.move.left &&
                     new Date() - sm.timer > 200
                 );
             }
@@ -74,7 +97,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
             () => {
                 return (
                     this.body.onFloor() &&
-                    this.keyboard.A.isDown &&
+                    this.move.left &&
                     new Date() - sm.timer > 100
                 );
             }
@@ -88,7 +111,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
             () => {
                 return (
                     this.body.onFloor() &&
-                    !this.keyboard.D.isDown &&
+                    !this.move.right &&
                     new Date() - sm.timer > 200
                 );
             }
@@ -101,7 +124,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
             () => {
                 return (
                     this.body.onFloor() &&
-                    this.keyboard.D.isDown &&
+                    this.move.right &&
                     new Date() - sm.timer > 100
                 );
             }
@@ -110,11 +133,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
         //Jump
 
         const jumpFunction = () => {
-            return (
-                this.body.onFloor() &&
-                this.keyboard.W.isDown &&
-                this.body.velocity.y == 0
-            );
+            return this.body.onFloor() && this.move.up;
         };
 
         sm.transition(
@@ -142,8 +161,8 @@ export class SlimegCharacterSprite extends CharacterSprite {
         sm.transition("jumping_to_standing", "jumping", "standing", () => {
             return (
                 this.body.onFloor() &&
-                this.body.velocity.y == 0 &&
-                !(this.keyboard.D.isDown || this.keyboard.A.isDown)
+                new Date() - sm.timer > 1 &&
+                !(this.move.right || this.move.left)
             );
         });
 
@@ -154,8 +173,8 @@ export class SlimegCharacterSprite extends CharacterSprite {
             () => {
                 return (
                     this.body.onFloor() &&
-                    this.body.velocity.y == 0 &&
-                    this.keyboard.D.isDown
+                    new Date() - sm.timer > 1 &&
+                    this.move.right
                 );
             }
         );
@@ -167,8 +186,8 @@ export class SlimegCharacterSprite extends CharacterSprite {
             () => {
                 return (
                     this.body.onFloor() &&
-                    this.body.velocity.y == 0 &&
-                    this.keyboard.A.isDown
+                    new Date() - sm.timer > 1 &&
+                    this.move.left
                 );
             }
         );
@@ -178,6 +197,8 @@ export class SlimegCharacterSprite extends CharacterSprite {
 
     preUpdate(time, delta) {
         super.preUpdate && super.preUpdate(time, delta);
+
+        this.keysTostate();
         this.stateMachine.update();
     }
 }
