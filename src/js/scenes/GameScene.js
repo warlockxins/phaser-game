@@ -3,6 +3,7 @@ import { CST } from "../constants/CST";
 import { addAnimation, SlimegCharacterSprite } from "../Sprite";
 import { ANIMATIONS } from "../animation";
 import { platformerInput } from "../scriptComponent/platformerInput";
+import { platformerInputBot } from "../scriptComponent/platformerInputBot";
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -24,6 +25,7 @@ export class GameScene extends Phaser.Scene {
 
     setupPhysics() {
         this.physics.add.collider(this.slime, this.topLayer);
+        this.physics.add.collider(this.slimeb, this.topLayer);
         this.topLayer.setCollisionByProperty({ collision: true });
     }
 
@@ -34,6 +36,10 @@ export class GameScene extends Phaser.Scene {
         this.slime.setScale(0.5, 0.5);
 
         this.cameras.main.startFollow(this.slime);
+
+        const componentsBot = [platformerInputBot];
+        this.slimeb = new SlimegCharacterSprite(this, 200, 200, componentsBot);
+        this.slimeb.setScale(0.5, 0.5);
     }
 
     addLevel() {
