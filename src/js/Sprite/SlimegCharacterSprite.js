@@ -9,18 +9,17 @@ export class SlimegCharacterSprite extends CharacterSprite {
 
         scene.physics.world.enableBody(this);
 
-        this.scriptComponents = scriptComponents;
-
-        this.scriptComponents.forEach(component => {
-            component.start(this);
-        });
-
-        this.move = {
+        this.direction = {
             left: false,
             right: false,
             up: false
         };
 
+        this.scriptComponents = scriptComponents;
+
+        this.scriptComponents.forEach(component => {
+            component.start(scene, this);
+        });
         this.createStateMachine();
     }
 
@@ -88,7 +87,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
             () => {
                 return (
                     this.body.onFloor() &&
-                    !this.move.left &&
+                    !this.direction.left &&
                     new Date() - sm.timer > 200
                 );
             }
@@ -101,7 +100,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
             () => {
                 return (
                     this.body.onFloor() &&
-                    this.move.left &&
+                    this.direction.left &&
                     new Date() - sm.timer > 100
                 );
             }
@@ -115,7 +114,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
             () => {
                 return (
                     this.body.onFloor() &&
-                    !this.move.right &&
+                    !this.direction.right &&
                     new Date() - sm.timer > 200
                 );
             }
@@ -128,7 +127,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
             () => {
                 return (
                     this.body.onFloor() &&
-                    this.move.right &&
+                    this.direction.right &&
                     new Date() - sm.timer > 100
                 );
             }
@@ -137,7 +136,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
         //Jump
 
         const jumpFunction = () => {
-            return this.body.onFloor() && this.move.up;
+            return this.body.onFloor() && this.direction.up;
         };
 
         sm.transition(
@@ -166,7 +165,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
             return (
                 this.body.onFloor() &&
                 new Date() - sm.timer > 1 &&
-                !(this.move.right || this.move.left)
+                !(this.direction.right || this.direction.left)
             );
         });
 
@@ -178,7 +177,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
                 return (
                     this.body.onFloor() &&
                     new Date() - sm.timer > 1 &&
-                    this.move.right
+                    this.direction.right
                 );
             }
         );
@@ -191,7 +190,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
                 return (
                     this.body.onFloor() &&
                     new Date() - sm.timer > 1 &&
-                    this.move.left
+                    this.direction.left
                 );
             }
         );
