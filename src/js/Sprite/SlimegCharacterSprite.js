@@ -2,14 +2,18 @@ import { CharacterSprite } from "./CharacterSprite";
 import { StateMachine } from "../stateMachine/StateMachine";
 
 export class SlimegCharacterSprite extends CharacterSprite {
-    constructor(scene, x, y, keyboard) {
+    constructor(scene, x, y, scriptComponents) {
         const texture = "slimeg";
         const frame = "slime1.png";
         super(scene, x, y, texture, frame);
 
         scene.physics.world.enableBody(this);
 
-        this.keyboard = keyboard;
+        this.scriptComponents = scriptComponents;
+
+        this.scriptComponents.forEach(component => {
+            component.start(this);
+        });
 
         this.move = {
             left: false,
@@ -20,10 +24,10 @@ export class SlimegCharacterSprite extends CharacterSprite {
         this.createStateMachine();
     }
 
-    keysTostate() {
-        this.move.left = this.keyboard.A.isDown;
-        this.move.right = this.keyboard.D.isDown;
-        this.move.up = this.keyboard.W.isDown;
+    handleScriptComponents() {
+        this.scriptComponents.forEach(component => {
+            component.update(this);
+        });
     }
 
     createStateMachine() {
@@ -197,8 +201,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
 
     preUpdate(time, delta) {
         super.preUpdate && super.preUpdate(time, delta);
-
-        this.keysTostate();
+        this.handleScriptComponents();
         this.stateMachine.update();
     }
 }

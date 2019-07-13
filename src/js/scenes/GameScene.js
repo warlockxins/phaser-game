@@ -27,13 +27,22 @@ export class GameScene extends Phaser.Scene {
     }
 
     addSlimeAnimation() {
+        const components = [
+            {
+                start: gameObject => {
+                    gameObject.keyboard = this.input.keyboard.addKeys(
+                        "W, A, S, D"
+                    );
+                },
+                update: gameObject => {
+                    gameObject.move.left = gameObject.keyboard.A.isDown;
+                    gameObject.move.right = gameObject.keyboard.D.isDown;
+                    gameObject.move.up = gameObject.keyboard.W.isDown;
+                }
+            }
+        ];
         addAnimation(this, ANIMATIONS.slimeg);
-        this.slime = new SlimegCharacterSprite(
-            this,
-            80,
-            200,
-            this.input.keyboard.addKeys("W, A, S, D")
-        );
+        this.slime = new SlimegCharacterSprite(this, 80, 200, components);
         this.slime.setScale(0.5, 0.5);
 
         this.cameras.main.startFollow(this.slime);
