@@ -33,13 +33,14 @@ export class GameScene extends Phaser.Scene {
         const components = [platformerInput];
         addAnimation(this, ANIMATIONS.slimeg);
         this.slime = new SlimegCharacterSprite(this, 80, 200, components);
-        this.slime.setScale(0.5, 0.5);
+        this.slime.setScale(0.2);
 
         this.cameras.main.startFollow(this.slime);
 
         const componentsBot = [platformerInputBot];
         this.slimeb = new SlimegCharacterSprite(this, 200, 200, componentsBot);
-        this.slimeb.setScale(0.5, 0.5);
+        this.slimeb.setScale(0.5);
+        this.slimeb.tint = Math.random() * 0xffffff;
     }
 
     addLevel() {
