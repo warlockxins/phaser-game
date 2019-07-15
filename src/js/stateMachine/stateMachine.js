@@ -47,7 +47,7 @@ export class StateMachine {
         return transition;
     }
 
-    update() {
+    update(delta) {
         const state = this.states[this.currentState];
 
         if (this.previousState !== this.currentState) {
@@ -59,7 +59,7 @@ export class StateMachine {
         }
 
         if (state.update) {
-            state.update();
+            state.update(delta);
         }
         // Iterate through transitions.
         for (let name in this.transitions) {

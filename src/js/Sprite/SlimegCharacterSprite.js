@@ -8,6 +8,9 @@ export class SlimegCharacterSprite extends CharacterSprite {
         super(scene, x, y, texture, frame);
 
         scene.physics.world.enableBody(this);
+        this.body.setMaxSpeed(140);
+        this.body.setMaxSpeed(140);
+        this.body.setDragX(140);
 
         this.direction = {
             left: false,
@@ -34,30 +37,33 @@ export class SlimegCharacterSprite extends CharacterSprite {
 
         sm.state("standing", {
             enter: () => {
-                this.setVelocityX(0);
                 this.anims.play("stand", true);
+                this.body.setAllowDrag(true);
             },
-            update: function() {},
+            update: increase => {
+                if (this.direction.left) {
+                    this.body.velocity.x -= increase;
+                } else if (this.direction.right) {
+                    this.body.velocity.x += increase;
+                }
+            },
             exit: function() {}
         });
 
-        sm.state("walking_left", {
+        sm.state("walking", {
             enter: () => {
                 this.anims.play("walk", true);
-                this.flipX = false;
-                this.setVelocityX(-100);
+                this.body.setAllowDrag(true);
             },
-            update: () => {},
-            exit: () => {}
-        });
+            update: increase => {
+                if (this.direction.left) {
+                    this.body.velocity.x -= increase;
+                } else if (this.direction.right) {
+                    this.body.velocity.x += increase;
+                }
 
-        sm.state("walking_right", {
-            enter: () => {
-                this.anims.play("walk", true);
-                this.flipX = true;
-                this.setVelocityX(100);
+                this.flipX = this.body.velocity.x > 0;
             },
-            update: () => {},
             exit: () => {}
         });
 
@@ -66,8 +72,17 @@ export class SlimegCharacterSprite extends CharacterSprite {
                 this.setVelocity(this.body.velocity.x, -140);
 
                 this.anims.stop();
+                this.body.setAllowDrag(false);
             },
-            update: () => {},
+            update: delta => {
+                const increase = 0.5 + delta;
+
+                if (this.direction.left) {
+                    this.body.velocity.x -= increase;
+                } else if (this.direction.right) {
+                    this.body.velocity.x += increase;
+                }
+            },
             exit: () => {}
         });
 
@@ -79,59 +94,23 @@ export class SlimegCharacterSprite extends CharacterSprite {
             update: () => {},
             exit: () => {}
         });
+
         // walkin left
-        sm.transition(
-            "walking_left_to_standing",
-            "walking_left",
-            "standing",
-            () => {
-                return (
-                    this.body.onFloor() &&
-                    !this.direction.left &&
-                    new Date() - sm.timer > 200
-                );
-            }
-        );
+        sm.transition("walking_to_standing", "walking", "standing", () => {
+            return (
+                this.body.onFloor() &&
+                Math.abs(this.body.velocity.x) < 2 &&
+                new Date() - sm.timer > 200
+            );
+        });
 
-        sm.transition(
-            "standing_to_walking_left",
-            "standing",
-            "walking_left",
-            () => {
-                return (
-                    this.body.onFloor() &&
-                    this.direction.left &&
-                    new Date() - sm.timer > 100
-                );
-            }
-        );
-
-        //waliking right
-        sm.transition(
-            "walking_right_to_standing",
-            "walking_right",
-            "standing",
-            () => {
-                return (
-                    this.body.onFloor() &&
-                    !this.direction.right &&
-                    new Date() - sm.timer > 200
-                );
-            }
-        );
-
-        sm.transition(
-            "standing_to_walking_right",
-            "standing",
-            "walking_right",
-            () => {
-                return (
-                    this.body.onFloor() &&
-                    this.direction.right &&
-                    new Date() - sm.timer > 100
-                );
-            }
-        );
+        sm.transition("standing_to_walking", "standing", "walking", () => {
+            return (
+                this.body.onFloor() &&
+                Math.abs(this.body.velocity.x) > 2 &&
+                new Date() - sm.timer > 100
+            );
+        });
 
         //Jump
 
@@ -146,54 +125,24 @@ export class SlimegCharacterSprite extends CharacterSprite {
             jumpFunction
         );
 
-        sm.transition(
-            "walking_right_to_jumping",
-            "walking_right",
-            "jumping",
-            jumpFunction
-        );
-
-        sm.transition(
-            "walking_left_to_jumping",
-            "walking_left",
-            "jumping",
-            jumpFunction
-        );
+        sm.transition("walking_to_jumping", "walking", "jumping", jumpFunction);
 
         // landing
         sm.transition("jumping_to_standing", "jumping", "standing", () => {
             return (
                 this.body.onFloor() &&
                 new Date() - sm.timer > 1 &&
-                !(this.direction.right || this.direction.left)
+                Math.abs(this.body.velocity.x) < 2
             );
         });
 
-        sm.transition(
-            "jumping_to_walking_right",
-            "jumping",
-            "walking_right",
-            () => {
-                return (
-                    this.body.onFloor() &&
-                    new Date() - sm.timer > 1 &&
-                    this.direction.right
-                );
-            }
-        );
-
-        sm.transition(
-            "jumping_to_walking_left",
-            "jumping",
-            "walking_left",
-            () => {
-                return (
-                    this.body.onFloor() &&
-                    new Date() - sm.timer > 1 &&
-                    this.direction.left
-                );
-            }
-        );
+        sm.transition("jumping_to_walking", "jumping", "walking", () => {
+            return (
+                this.body.onFloor() &&
+                new Date() - sm.timer > 1 &&
+                Math.abs(this.body.velocity.x) > 2
+            );
+        });
 
         this.stateMachine = sm;
     }
@@ -201,6 +150,6 @@ export class SlimegCharacterSprite extends CharacterSprite {
     preUpdate(time, delta) {
         super.preUpdate && super.preUpdate(time, delta);
         this.handleScriptComponents();
-        this.stateMachine.update();
+        this.stateMachine.update(delta);
     }
 }
