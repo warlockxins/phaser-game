@@ -34,21 +34,6 @@ export class SlimegCharacterSprite extends CharacterSprite {
     createStateMachine() {
         const sm = new StateMachine();
 
-        sm.state("standing", {
-            enter: () => {
-                this.anims.play("stand", true);
-                this.body.setAllowDrag(true);
-            },
-            update: increase => {
-                if (this.direction.left) {
-                    this.body.velocity.x -= increase;
-                } else if (this.direction.right) {
-                    this.body.velocity.x += increase;
-                }
-            },
-            exit: function() {}
-        });
-
         const addWalkSpeed = increase => {
             if (this.direction.left) {
                 this.body.velocity.x -= increase;
@@ -58,6 +43,17 @@ export class SlimegCharacterSprite extends CharacterSprite {
                 this.flipX = this.body.velocity.x > 1;
             }
         };
+
+        sm.state("standing", {
+            enter: () => {
+                this.anims.play("stand", true);
+                this.body.setAllowDrag(true);
+            },
+            update: increase => {
+                addWalkSpeed(increase);
+            },
+            exit: function() {}
+        });
 
         sm.state("walking", {
             enter: () => {
@@ -85,7 +81,6 @@ export class SlimegCharacterSprite extends CharacterSprite {
 
         sm.state("falling", {
             enter: () => {
-                //temp
                 this.anims.play("stand", false);
             },
             update: delta => {
@@ -115,25 +110,24 @@ export class SlimegCharacterSprite extends CharacterSprite {
 
         sm.transition("walking_to_jumping", "walking", "jumping", jumpFunction);
 
-        // landing
+        // falling
         sm.transition("jumping_to_falling", "jumping", "falling", () => {
             return this.body.velocity.y >= 0;
         });
+        sm.transition("walking_to_falling", "walking", "falling", () => {
+            return this.body.velocity.y > 0;
+        });
+        sm.transition("standing_to_falling", "standing", "falling", () => {
+            return this.body.velocity.y > 0;
+        });
 
+        // landing
         sm.transition("falling_to_standing", "falling", "standing", () => {
-            return (
-                this.body.onFloor() &&
-                this.body.velocity.y >= 0 &&
-                Math.abs(this.body.velocity.x) < 2
-            );
+            return this.body.onFloor() && Math.abs(this.body.velocity.x) < 2;
         });
 
         sm.transition("falling_to_walking", "falling", "walking", () => {
-            return (
-                this.body.onFloor() &&
-                this.body.velocity.y >= 0 &&
-                Math.abs(this.body.velocity.x) > 2
-            );
+            return this.body.onFloor() && Math.abs(this.body.velocity.x) > 2;
         });
 
         this.stateMachine = sm;
