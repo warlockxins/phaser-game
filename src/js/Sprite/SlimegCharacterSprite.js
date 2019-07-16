@@ -8,8 +8,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
         super(scene, x, y, texture, frame);
 
         scene.physics.world.enableBody(this);
-        this.body.setMaxSpeed(140);
-        this.body.setMaxSpeed(140);
+        this.body.setMaxVelocity(140, 140);
         this.body.setDragX(140);
 
         this.direction = {
@@ -50,38 +49,36 @@ export class SlimegCharacterSprite extends CharacterSprite {
             exit: function() {}
         });
 
+        const addWalkSpeed = increase => {
+            if (this.direction.left) {
+                this.body.velocity.x -= increase;
+                this.flipX = !this.body.velocity.x > 1;
+            } else if (this.direction.right) {
+                this.body.velocity.x += increase;
+                this.flipX = this.body.velocity.x > 1;
+            }
+        };
+
         sm.state("walking", {
             enter: () => {
                 this.anims.play("walk", true);
                 this.body.setAllowDrag(true);
             },
             update: increase => {
-                if (this.direction.left) {
-                    this.body.velocity.x -= increase;
-                } else if (this.direction.right) {
-                    this.body.velocity.x += increase;
-                }
-
-                this.flipX = this.body.velocity.x > 0;
+                addWalkSpeed(increase);
             },
             exit: () => {}
         });
 
         sm.state("jumping", {
             enter: () => {
-                this.setVelocity(this.body.velocity.x, -140);
+                this.setVelocityY(-140);
 
                 this.anims.stop();
                 this.body.setAllowDrag(false);
             },
             update: delta => {
-                const increase = 0.5 + delta;
-
-                if (this.direction.left) {
-                    this.body.velocity.x -= increase;
-                } else if (this.direction.right) {
-                    this.body.velocity.x += increase;
-                }
+                addWalkSpeed(0.3 * delta);
             },
             exit: () => {}
         });
@@ -97,19 +94,11 @@ export class SlimegCharacterSprite extends CharacterSprite {
 
         // walkin left
         sm.transition("walking_to_standing", "walking", "standing", () => {
-            return (
-                this.body.onFloor() &&
-                Math.abs(this.body.velocity.x) < 2 &&
-                new Date() - sm.timer > 200
-            );
+            return this.body.onFloor() && Math.abs(this.body.velocity.x) < 2;
         });
 
         sm.transition("standing_to_walking", "standing", "walking", () => {
-            return (
-                this.body.onFloor() &&
-                Math.abs(this.body.velocity.x) > 2 &&
-                new Date() - sm.timer > 100
-            );
+            return this.body.onFloor() && Math.abs(this.body.velocity.x) > 2;
         });
 
         //Jump
@@ -131,7 +120,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
         sm.transition("jumping_to_standing", "jumping", "standing", () => {
             return (
                 this.body.onFloor() &&
-                new Date() - sm.timer > 1 &&
+                this.body.velocity.y >= 0 &&
                 Math.abs(this.body.velocity.x) < 2
             );
         });
@@ -139,7 +128,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
         sm.transition("jumping_to_walking", "jumping", "walking", () => {
             return (
                 this.body.onFloor() &&
-                new Date() - sm.timer > 1 &&
+                this.body.velocity.y >= 0 &&
                 Math.abs(this.body.velocity.x) > 2
             );
         });
