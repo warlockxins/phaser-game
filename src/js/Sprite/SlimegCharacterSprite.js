@@ -86,9 +86,11 @@ export class SlimegCharacterSprite extends CharacterSprite {
         sm.state("falling", {
             enter: () => {
                 //temp
-                this.anims.play("stand", true);
+                this.anims.play("stand", false);
             },
-            update: () => {},
+            update: delta => {
+                addWalkSpeed(0.3 * delta);
+            },
             exit: () => {}
         });
 
@@ -102,10 +104,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
         });
 
         //Jump
-
-        const jumpFunction = () => {
-            return this.body.onFloor() && this.direction.up;
-        };
+        const jumpFunction = () => this.body.onFloor() && this.direction.up;
 
         sm.transition(
             "standing_to_jumping",
@@ -117,7 +116,11 @@ export class SlimegCharacterSprite extends CharacterSprite {
         sm.transition("walking_to_jumping", "walking", "jumping", jumpFunction);
 
         // landing
-        sm.transition("jumping_to_standing", "jumping", "standing", () => {
+        sm.transition("jumping_to_falling", "jumping", "falling", () => {
+            return this.body.velocity.y >= 0;
+        });
+
+        sm.transition("falling_to_standing", "falling", "standing", () => {
             return (
                 this.body.onFloor() &&
                 this.body.velocity.y >= 0 &&
@@ -125,7 +128,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
             );
         });
 
-        sm.transition("jumping_to_walking", "jumping", "walking", () => {
+        sm.transition("falling_to_walking", "falling", "walking", () => {
             return (
                 this.body.onFloor() &&
                 this.body.velocity.y >= 0 &&
