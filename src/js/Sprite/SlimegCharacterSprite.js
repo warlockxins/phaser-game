@@ -9,7 +9,6 @@ export class SlimegCharacterSprite extends CharacterSprite {
 
         scene.physics.world.enableBody(this);
         this.body.setMaxVelocity(140, 140);
-        this.body.setDragX(140);
 
         this.direction = {
             left: false,
@@ -134,7 +133,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
     }
 
     preUpdate(time, delta) {
-        super.preUpdate && super.preUpdate(time, delta);
+        super.preUpdate(time, delta);
         this.handleScriptComponents();
         this.stateMachine.update(delta);
     }

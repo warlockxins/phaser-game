@@ -24,9 +24,8 @@ export class GameScene extends Phaser.Scene {
     }
 
     setupPhysics() {
-        this.physics.add.collider(this.slime, this.topLayer);
-        this.physics.add.collider(this.slimeb, this.topLayer);
         this.topLayer.setCollisionByProperty({ collision: true });
+        this.physics.add.collider(this.movingSprites, this.topLayer);
     }
 
     addSlimeAnimation() {
@@ -41,6 +40,13 @@ export class GameScene extends Phaser.Scene {
         this.slimeb = new SlimegCharacterSprite(this, 200, 200, componentsBot);
         this.slimeb.setScale(0.5);
         this.slimeb.tint = Math.random() * 0xffffff;
+
+        this.movingSprites = this.physics.add.group({
+            collideWorldBounds: true,
+            dragX: 140
+        });
+        this.movingSprites.add(this.slime);
+        this.movingSprites.add(this.slimeb);
     }
 
     addLevel() {
