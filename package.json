@@ -2,20 +2,24 @@
     "name": "game-test",
     "version": "0.0.1",
     "description": "start of the journey",
-    "main": "index.js",
+    "main": "src/js/app.ts",
     "scripts": {
-        "start": "npx webpack-dev-server --open --config ./build-config/webpack-dev.js",
-        "build:prod": "npx webpack -p --config ./build-config/webpack-common.js",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "dev": "rollup --config rollup.config.dev.js",
+        "build": "rollup --config rollup.config.dist.js",
+        "watch": "rollup --watch --config rollup.config.dev.js"
     },
     "author": "",
     "license": "ISC",
     "dependencies": {},
     "devDependencies": {
-        "copy-webpack-plugin": "^5.0.0",
-        "webpack": "^4.29.5",
-        "webpack-cli": "^3.2.3",
-        "webpack-dev-server": "^3.2.0",
-        "webpack-merge": "^4.2.1"
+        "@rollup/plugin-replace": "^2.3.0",
+        "phaser": "^3.22.0",
+        "rollup": "^1.29.0",
+        "rollup-plugin-commonjs": "^10.1.0",
+        "rollup-plugin-node-resolve": "^5.2.0",
+        "rollup-plugin-serve": "^1.0.1",
+        "rollup-plugin-typescript2": "^0.25.3",
+        "rollup-plugin-uglify": "^6.0.4",
+        "typescript": "^3.7.4"
     }
 }

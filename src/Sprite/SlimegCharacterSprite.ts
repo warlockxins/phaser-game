@@ -1,14 +1,30 @@
 import { CharacterSprite } from "./CharacterSprite";
 import { StateMachine } from "../stateMachine/StateMachine";
+import { ScriptComponent } from "../scriptComponent/scriptComponent";
+
+interface MoveDirection {
+    left: boolean;
+    right: boolean;
+    up: boolean;
+}
 
 export class SlimegCharacterSprite extends CharacterSprite {
-    constructor(scene, x, y, scriptComponents) {
-        const texture = "slimeg";
-        const frame = "slime1.png";
-        super(scene, x, y, texture, frame);
+    direction: MoveDirection;
+    scriptComponents: ScriptComponent[];
+    body: Phaser.Physics.Arcade.Body = undefined;
+    stateMachine: StateMachine = undefined;
+
+    constructor(
+        scene: Phaser.Scene,
+        x,
+        y,
+        scriptComponents: ScriptComponent[]
+    ) {
+        super(scene, x, y, "slimeg", "slime1.png");
 
         scene.physics.world.enableBody(this);
-        this.body.setMaxVelocity(140, 140);
+        const body: Phaser.Physics.Arcade.Body = this.body;
+        body.setMaxVelocity(140, 140);
 
         this.direction = {
             left: false,
@@ -36,7 +52,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
         const addWalkSpeed = increase => {
             if (this.direction.left) {
                 this.body.velocity.x -= increase;
-                this.flipX = !this.body.velocity.x > 1;
+                this.flipX = !(this.body.velocity.x > 1);
             } else if (this.direction.right) {
                 this.body.velocity.x += increase;
                 this.flipX = this.body.velocity.x > 1;

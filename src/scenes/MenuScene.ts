@@ -1,6 +1,8 @@
 import { CST } from "../constants/CST";
 // Great that this exists https://www.youtube.com/watch?v=55DzXMkCfVA
 export class MenuScene extends Phaser.Scene {
+    clickButton: Phaser.GameObjects.Text;
+
     constructor() {
         super({
             key: CST.SCENES.MENU
@@ -16,8 +18,8 @@ export class MenuScene extends Phaser.Scene {
         // this.scene.start(CST.SCENES.MENU);
         // this.clickCountText = this.add.text(100, 200, "");
 
-        this.clickButton = this.add
-            .text(100, 100, "Start!", { fill: "#0f0" })
+        this.clickButton = this.add.text(100, 100, "Start!", { fill: "#0f0" });
+        this.clickButton
             .setInteractive()
             .on("pointerdown", () => this.startPressed())
             .on("pointerover", () => this.enterButtonHoverState())

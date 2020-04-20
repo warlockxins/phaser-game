@@ -2,10 +2,20 @@
 import { CST } from "../constants/CST";
 import { addAnimation, SlimegCharacterSprite } from "../Sprite";
 import { ANIMATIONS } from "../animation";
+
+import { ScriptComponent } from "../scriptComponent/scriptComponent";
 import { platformerInput } from "../scriptComponent/platformerInput";
 import { platformerInputBot } from "../scriptComponent/platformerInputBot";
 
 export class GameScene extends Phaser.Scene {
+    map: Phaser.Tilemaps.Tilemap;
+    topLayer: Phaser.Tilemaps.StaticTilemapLayer;
+    bottomLayer: Phaser.Tilemaps.StaticTilemapLayer;
+    movingSprites: Phaser.Physics.Arcade.Group;
+
+    slime: SlimegCharacterSprite;
+    slimeb: SlimegCharacterSprite;
+
     constructor() {
         super({
             key: CST.SCENES.GAME
@@ -29,14 +39,14 @@ export class GameScene extends Phaser.Scene {
     }
 
     addSlimeAnimation() {
-        const components = [platformerInput];
+        const components: ScriptComponent[] = [platformerInput];
         addAnimation(this, ANIMATIONS.slimeg);
         this.slime = new SlimegCharacterSprite(this, 80, 200, components);
         this.slime.setScale(0.2);
 
         this.cameras.main.startFollow(this.slime);
 
-        const componentsBot = [platformerInputBot];
+        const componentsBot: ScriptComponent[] = [platformerInputBot];
         this.slimeb = new SlimegCharacterSprite(this, 200, 200, componentsBot);
         this.slimeb.setScale(0.5);
         this.slimeb.tint = Math.random() * 0xffffff;

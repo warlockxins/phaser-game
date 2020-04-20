@@ -34,7 +34,7 @@ npm install
 Next, to stard developing with live update, perform:
 
 ```
-npm run start
+npm run watch
 ```
 
 you will be able to code and see live changes in the browser.
@@ -45,7 +45,7 @@ If you wish to `stop dev server`, just press `Ctrl+C` key combination
 Once the game is done perform:
 
 ```
-npm run build:prod
+npm run build
 ```
 
 This will create `dist` folder in root of this project, which is ready to publish on any website

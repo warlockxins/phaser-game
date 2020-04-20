@@ -1,5 +1,25 @@
 // modified from https://github.com/drhayes/impactjs-statemachine
+
+interface StateMachineState {
+    enter(): void;
+    update(deltaTime: number): void;
+    exit(): void;
+}
+interface StateMachineTransition {
+    name: string;
+    fromState: string;
+    toState: string;
+    predicate(): boolean;
+}
+
 export class StateMachine {
+    states: { [key: string]: StateMachineState };
+    transitions: { [key: string]: StateMachineTransition };
+    initialState: any;
+    currentState: any;
+    previousState: any;
+    timer: any;
+
     constructor() {
         this.states = {};
         this.transitions = {};
@@ -53,7 +73,7 @@ export class StateMachine {
         if (this.previousState !== this.currentState) {
             if (state.enter) {
                 this.timer = new Date();
-                state.enter(this.lastTransition);
+                state.enter();
             }
             this.previousState = this.currentState;
         }
@@ -68,7 +88,6 @@ export class StateMachine {
                 transition.fromState === this.currentState &&
                 transition.predicate()
             ) {
-                this.lastTransition = transition;
                 if (state.exit) {
                     state.exit();
                 }

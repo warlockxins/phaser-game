@@ -35,7 +35,7 @@ export class LoadScene extends Phaser.Scene {
     }
     create() {
         setTimeout(() => {
-            this.scene.start(CST.SCENES.MENU, "from load scene");
+            this.scene.start(CST.SCENES.MENU, { message: "from load scene" });
         }, 500);
     }
 }

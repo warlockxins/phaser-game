@@ -1,4 +1,11 @@
-export const platformerInputBot = {
+import { ScriptComponent } from "./scriptComponent";
+
+interface BotInput {
+    directionRight: boolean;
+    timer: any;
+}
+
+export const platformerInputBot: ScriptComponent & BotInput = {
     directionRight: true,
     timer: null,
     start(scene, gameObject) {

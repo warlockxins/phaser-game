@@ -1,4 +1,6 @@
-export const platformerInput = {
+import { ScriptComponent } from "./scriptComponent";
+
+export const platformerInput: ScriptComponent = {
     start(scene, gameObject) {
         if (!gameObject.direction) {
             throw new Error("Missing Sprite 'direction'");
@@ -9,5 +11,6 @@ export const platformerInput = {
         gameObject.direction.left = gameObject.keyboard.A.isDown;
         gameObject.direction.right = gameObject.keyboard.D.isDown;
         gameObject.direction.up = gameObject.keyboard.W.isDown;
-    }
+    },
+    destroy() {}
 };
