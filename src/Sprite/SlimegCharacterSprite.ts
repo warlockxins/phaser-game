@@ -14,6 +14,8 @@ export class SlimegCharacterSprite extends CharacterSprite {
     body: Phaser.Physics.Arcade.Body = undefined;
     stateMachine: StateMachine = undefined;
 
+    text: Phaser.GameObjects.Text = undefined;
+
     constructor(
         scene: Phaser.Scene,
         x,
@@ -25,60 +27,88 @@ export class SlimegCharacterSprite extends CharacterSprite {
         scene.physics.world.enableBody(this);
         const body: Phaser.Physics.Arcade.Body = this.body;
         body.setMaxVelocity(140, 140);
+        this.setOrigin(0.5);
 
         this.direction = {
             left: false,
             right: false,
-            up: false
+            up: false,
         };
 
         this.scriptComponents = scriptComponents;
 
-        this.scriptComponents.forEach(component => {
+        this.scriptComponents.forEach((component) => {
             component.start(scene, this);
         });
+
         this.createStateMachine();
+        this.createText();
+    }
+
+    updateText() {
+        this.text.x = this.x;
+        this.text.y = Math.floor(this.y - this.displayHeight);
+    }
+    createText() {
+        const style = {
+            font: "14px Arial",
+            fill: "#ff0044",
+            wordWrap: true,
+            wordWrapWidth: this.width,
+            align: "center",
+            backgroundColor: "#ffff00",
+        };
+
+        this.text = this.scene.add.text(
+            0,
+            0,
+            "- text on a sprite -\ndrag me",
+            style
+        );
+        this.text.setOrigin(0.5);
     }
 
     handleScriptComponents() {
-        this.scriptComponents.forEach(component => {
+        this.scriptComponents.forEach((component) => {
             component.update(this);
         });
+    }
+
+    addWalkSpeed(increase) {
+        if (this.direction.left) {
+            this.body.velocity.x -= increase;
+            this.flipX = false;
+        } else if (this.direction.right) {
+            this.body.velocity.x += increase;
+            this.flipX = true;
+        }
     }
 
     createStateMachine() {
         const sm = new StateMachine();
 
-        const addWalkSpeed = increase => {
-            if (this.direction.left) {
-                this.body.velocity.x -= increase;
-                this.flipX = !(this.body.velocity.x > 1);
-            } else if (this.direction.right) {
-                this.body.velocity.x += increase;
-                this.flipX = this.body.velocity.x > 1;
-            }
-        };
-
         sm.state("standing", {
             enter: () => {
                 this.anims.play("stand", true);
                 this.body.setAllowDrag(true);
+                this.text.setText("standing");
             },
-            update: increase => {
-                addWalkSpeed(increase);
+            update: (increase) => {
+                this.addWalkSpeed(increase);
             },
-            exit: function() {}
+            exit: function () {},
         });
 
         sm.state("walking", {
             enter: () => {
                 this.anims.play("walk", true);
-                this.body.setAllowDrag(true);
+                this.text.setText("walking");
+                // this.body.setAllowDrag(true);
             },
-            update: increase => {
-                addWalkSpeed(increase);
+            update: (increase) => {
+                this.addWalkSpeed(increase);
             },
-            exit: () => {}
+            exit: () => {},
         });
 
         sm.state("jumping", {
@@ -86,31 +116,33 @@ export class SlimegCharacterSprite extends CharacterSprite {
                 this.setVelocityY(-140);
 
                 this.anims.stop();
-                this.body.setAllowDrag(false);
+                this.text.setText("jumping");
+                // this.body.setAllowDrag(false);
             },
-            update: delta => {
-                addWalkSpeed(0.3 * delta);
+            update: (delta) => {
+                this.addWalkSpeed(0.3 * delta);
             },
-            exit: () => {}
+            exit: () => {},
         });
 
         sm.state("falling", {
             enter: () => {
                 this.anims.play("stand", false);
+                this.text.setText("falling");
             },
-            update: delta => {
-                addWalkSpeed(0.3 * delta);
+            update: (delta) => {
+                this.addWalkSpeed(0.3 * delta);
             },
-            exit: () => {}
+            exit: () => {},
         });
 
         // walkin left
         sm.transition("walking_to_standing", "walking", "standing", () => {
-            return this.body.onFloor() && Math.abs(this.body.velocity.x) < 2;
+            return this.body.onFloor() && Math.abs(this.body.velocity.x) === 0;
         });
 
         sm.transition("standing_to_walking", "standing", "walking", () => {
-            return this.body.onFloor() && Math.abs(this.body.velocity.x) > 2;
+            return this.body.onFloor() && Math.abs(this.body.velocity.x) > 0;
         });
 
         //Jump
@@ -127,7 +159,7 @@ export class SlimegCharacterSprite extends CharacterSprite {
 
         // falling
         sm.transition("jumping_to_falling", "jumping", "falling", () => {
-            return this.body.velocity.y >= 0;
+            return this.body.velocity.y > 0;
         });
         sm.transition("walking_to_falling", "walking", "falling", () => {
             return this.body.velocity.y > 0;
@@ -152,5 +184,6 @@ export class SlimegCharacterSprite extends CharacterSprite {
         super.preUpdate(time, delta);
         this.handleScriptComponents();
         this.stateMachine.update(delta);
+        this.updateText();
     }
 }
