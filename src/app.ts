@@ -10,10 +10,13 @@ import { LoadScene } from "./scenes/LoadScene";
 import { MenuScene } from "./scenes/MenuScene";
 import { GameScene } from "./scenes/GameScene";
 
-const config = {
+const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
+    render: {
+        pixelArt: true,
+    },
     physics: {
         default: "arcade",
         arcade: {
