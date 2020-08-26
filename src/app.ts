@@ -3,8 +3,7 @@
 // https://labs.phaser.io/edit.html?src=src%5Cgame%20objects%5Ctilemap%5Cstatic%5Ctileset%20collision%20shapes.js
 // import Phaser from "phaser/src/phaser.js";
 
-import "phaser";
-// import * as Phaser from "./phaser";
+import Phaser from "phaser";
 
 import { LoadScene } from "./scenes/LoadScene";
 import { MenuScene } from "./scenes/MenuScene";
@@ -21,7 +20,6 @@ const config: Phaser.Types.Core.GameConfig = {
         default: "arcade",
         arcade: {
             gravity: { y: 200 },
-            debug: true,
         },
     },
     scene: [LoadScene, MenuScene, GameScene],

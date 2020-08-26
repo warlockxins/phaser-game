@@ -11,10 +11,10 @@ interface MoveDirection {
 export class SlimegCharacterSprite extends CharacterSprite {
     direction: MoveDirection;
     scriptComponents: ScriptComponent[];
-    body: Phaser.Physics.Arcade.Body = undefined;
-    stateMachine: StateMachine = undefined;
+    body!: Phaser.Physics.Arcade.Body;
+    stateMachine!: StateMachine;
 
-    text: Phaser.GameObjects.Text = undefined;
+    text!: Phaser.GameObjects.Text;
 
     constructor(
         scene: Phaser.Scene,

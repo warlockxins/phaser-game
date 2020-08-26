@@ -1,11 +1,11 @@
 import { CST } from "../constants/CST";
 // Great that this exists https://www.youtube.com/watch?v=55DzXMkCfVA
 export class MenuScene extends Phaser.Scene {
-    clickButton: Phaser.GameObjects.Text;
+    clickButton!: Phaser.GameObjects.Text;
 
     constructor() {
         super({
-            key: CST.SCENES.MENU
+            key: CST.SCENES.MENU,
         });
     }
 

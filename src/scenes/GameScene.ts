@@ -8,13 +8,12 @@ import { platformerInput } from "../scriptComponent/platformerInput";
 import { platformerInputBot } from "../scriptComponent/platformerInputBot";
 
 export class GameScene extends Phaser.Scene {
-    map: Phaser.Tilemaps.Tilemap;
-    topLayer: Phaser.Tilemaps.StaticTilemapLayer;
-    bottomLayer: Phaser.Tilemaps.StaticTilemapLayer;
-    movingSprites: Phaser.Physics.Arcade.Group;
+    map!: Phaser.Tilemaps.Tilemap;
+    topLayer!: Phaser.Tilemaps.StaticTilemapLayer;
+    bottomLayer!: Phaser.Tilemaps.StaticTilemapLayer;
+    movingSprites!: Phaser.Physics.Arcade.Group;
 
-    slime: SlimegCharacterSprite;
-    slimeb: SlimegCharacterSprite;
+    slime?: SlimegCharacterSprite;
 
     constructor() {
         super({
@@ -46,17 +45,11 @@ export class GameScene extends Phaser.Scene {
 
         this.cameras.main.startFollow(this.slime);
 
-        // const componentsBot: ScriptComponent[] = [platformerInputBot];
-        // this.slimeb = new SlimegCharacterSprite(this, 200, 200, componentsBot);
-        // this.slimeb.setScale(0.5);
-        // this.slimeb.tint = Math.random() * 0xffffff;
-
         this.movingSprites = this.physics.add.group({
             collideWorldBounds: true,
             dragX: 140,
         });
         this.movingSprites.add(this.slime);
-        // this.movingSprites.add(this.slimeb);
     }
 
     addLevel() {

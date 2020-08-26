@@ -4,22 +4,29 @@
     "description": "start of the journey",
     "main": "src/js/app.ts",
     "scripts": {
-        "dev": "rollup --config rollup.config.dev.js",
-        "build": "rollup --config rollup.config.dist.js",
-        "watch": "rollup --watch --config rollup.config.dev.js"
+        "start": "parcel src/index.html -p 8000",
+        "build": "parcel build src/index.html --out-dir dist"
     },
     "author": "",
     "license": "ISC",
-    "dependencies": {},
+    "dependencies": {
+        "phaser": "^3.24.1"
+    },
     "devDependencies": {
-        "@rollup/plugin-replace": "^2.3.0",
-        "phaser": "^3.22.0",
-        "rollup": "^1.29.0",
-        "rollup-plugin-commonjs": "^10.1.0",
-        "rollup-plugin-node-resolve": "^5.2.0",
-        "rollup-plugin-serve": "^1.0.1",
-        "rollup-plugin-typescript2": "^0.25.3",
-        "rollup-plugin-uglify": "^6.0.4",
-        "typescript": "^3.7.4"
+        "parcel-bundler": "^1.12.4",
+        "@typescript-eslint/eslint-plugin": "^2.29.0",
+        "@typescript-eslint/parser": "^2.29.0",
+        "eslint": "^6.8.0",
+        "minimist": ">=1.2.2",
+        "parcel-plugin-clean-easy": "^1.0.2",
+        "parcel-plugin-static-files-copy": "^2.4.3",
+        "typescript": "^3.8.3"
+    },
+    "parcelCleanPaths": [
+        "dist"
+    ],
+    "staticFiles": {
+        "staticPath": "public",
+        "watcherGlob": "**"
     }
 }
