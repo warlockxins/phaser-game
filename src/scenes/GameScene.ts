@@ -34,14 +34,20 @@ export class GameScene extends Phaser.Scene {
 
     setupPhysics() {
         this.topLayer.setCollisionByProperty({ collision: true });
-        this.physics.add.collider(this.movingSprites, this.topLayer);
+        this.physics.add.collider(
+            this.movingSprites,
+            this.topLayer
+            // (collider1, collider2) => {
+            // const body1: Phaser.Physics.Arcade.Body = collider1.body as Phaser.Physics.Arcade.Body;
+            // console.log(body1.blocked);
+            // }
+        );
     }
 
     addSlimeAnimation() {
         const components: ScriptComponent[] = [platformerInput];
         addAnimation(this, ANIMATIONS.slimeg);
         this.slime = new SlimegCharacterSprite(this, 80, 200, components);
-        this.slime.setScale(0.2);
 
         this.cameras.main.startFollow(this.slime);
 
@@ -65,6 +71,9 @@ export class GameScene extends Phaser.Scene {
         this.topLayer = this.map
             .createStaticLayer("Top", [tiles], 0, 0)
             .setDepth(-1);
+
+        this.bottomLayer.alpha = 0.5;
+        this.topLayer.alpha = 0.5;
 
         this.cameras.main.setBounds(
             0,

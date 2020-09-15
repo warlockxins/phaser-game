@@ -1,55 +1,40 @@
 // modified from https://github.com/drhayes/impactjs-statemachine
-
-interface StateMachineState {
-    enter(): void;
-    update(deltaTime: number): void;
-    exit(): void;
-}
-interface StateMachineTransition {
-    name: string;
-    fromState: string;
-    toState: string;
-    predicate(): boolean;
-}
+import { IStateMachineState, IStateMachineTransition } from "./interfaces";
 
 export class StateMachine {
-    states: { [key: string]: StateMachineState };
-    transitions: { [key: string]: StateMachineTransition };
-    initialState: any;
-    currentState: any;
-    previousState: any;
+    states: IStateMachineState[];
+    transitions: IStateMachineTransition[];
+    initialState: number;
+    currentState: number;
+    previousState: number;
     timer: any;
+    context: { [key: string]: any };
 
     constructor() {
-        this.states = {};
-        this.transitions = {};
-        // Track states by name.
-        this.initialState = null;
-        this.currentState = null;
-        this.previousState = null;
+        this.states = [];
+        this.transitions = [];
+        // Track states by index.
+        this.initialState = 0;
+        this.currentState = 0;
+        this.previousState = 0;
         this.timer = null;
+        this.context = {};
     }
 
-    state(name, definition) {
-        if (!definition) {
-            return this.states[name];
+    state(index, smState: IStateMachineState) {
+        if (!smState) {
+            throw new Error("Missing State body: ");
         }
-        this.states[name] = definition;
+        this.states[index] = smState;
         if (!this.initialState) {
-            this.initialState = name;
-            this.currentState = name;
+            this.initialState = index;
+            this.currentState = index;
         }
     }
 
-    transition(name, fromState, toState, predicate) {
+    transition(name: string, fromState: number, toState: number, predicate) {
         if (!fromState && !toState && !predicate) {
             return this.transitions[name];
-        }
-        // Transitions don't require names.
-        if (!predicate) {
-            predicate = toState;
-            toState = fromState;
-            fromState = name;
         }
         if (!this.states[fromState]) {
             throw new Error("Missing from state: " + fromState);
@@ -57,14 +42,13 @@ export class StateMachine {
         if (!this.states[toState]) {
             throw new Error("Missing to state: " + toState);
         }
-        const transition = {
+        const transition: IStateMachineTransition = {
             name: name,
             fromState: fromState,
             toState: toState,
-            predicate: predicate
+            predicate: predicate,
         };
-        this.transitions[name] = transition;
-        return transition;
+        this.transitions.push(transition);
     }
 
     update(delta) {
@@ -82,8 +66,7 @@ export class StateMachine {
             state.update(delta);
         }
         // Iterate through transitions.
-        for (let name in this.transitions) {
-            const transition = this.transitions[name];
+        for (const transition of this.transitions) {
             if (
                 transition.fromState === this.currentState &&
                 transition.predicate()
