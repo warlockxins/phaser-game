@@ -1,9 +1,7 @@
 import { StateMachine } from "../stateMachine/StateMachine";
+import { SlimegStateMachine } from "./SlimegStateMachine";
+
 import { ScriptComponent } from "../scriptComponent/scriptComponent";
-import { StandState } from "./SlimegStates/StandState";
-import { WalkState } from "./SlimegStates/WalkState";
-import { JumpState } from "./SlimegStates/JumpState";
-import { FallState } from "./SlimegStates/FallState";
 
 interface MoveDirection {
     left: boolean;
@@ -11,18 +9,6 @@ interface MoveDirection {
     up: boolean;
     down: boolean;
 }
-
-enum SLIMEG_STATE {
-    STAND,
-    WALK,
-    JUMP,
-    FALL,
-}
-
-// interface SlimegContext {
-//     onGround: boolean;
-//     xSpeed: number;
-// }
 
 export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
     direction: MoveDirection;
@@ -68,7 +54,7 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
             component.start(scene, this);
         });
 
-        this.createStateMachine();
+        this.stateMachine = new SlimegStateMachine(this);
         this.createText();
     }
 
@@ -101,11 +87,9 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
     addWalkSpeed(increase: number) {
         if (this.direction.left) {
             this.body.velocity.x -= increase;
-            // this.body.setAccelerationX(-100);
             this.sprite.flipX = false;
         } else if (this.direction.right) {
             this.body.velocity.x += increase;
-            // this.body.setAccelerationX(100);
             this.sprite.flipX = true;
         }
     }
@@ -120,64 +104,6 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
 
     shouldJump(): boolean {
         return this.body.onFloor() && this.direction.up;
-    }
-
-    createStateMachine() {
-        const sm = new StateMachine();
-        sm.addState(SLIMEG_STATE.STAND, new StandState(this));
-        sm.addState(SLIMEG_STATE.WALK, new WalkState(this));
-        sm.addState(SLIMEG_STATE.JUMP, new JumpState(this));
-        sm.addState(SLIMEG_STATE.FALL, new FallState(this));
-        //-------TRANSITIONS-------
-        sm.addTransition(
-            SLIMEG_STATE.WALK,
-            SLIMEG_STATE.STAND,
-            this.isOnGroundNotMoving.bind(this)
-        );
-        sm.addTransition(
-            SLIMEG_STATE.STAND,
-            SLIMEG_STATE.WALK,
-            this.isOnGroundMoving.bind(this)
-        );
-        //Jump
-        sm.addTransition(
-            SLIMEG_STATE.STAND,
-            SLIMEG_STATE.JUMP,
-            this.shouldJump.bind(this)
-        );
-        sm.addTransition(
-            SLIMEG_STATE.WALK,
-            SLIMEG_STATE.JUMP,
-            this.shouldJump.bind(this)
-        );
-        // falling
-        sm.addTransition(
-            SLIMEG_STATE.JUMP,
-            SLIMEG_STATE.FALL,
-            () => this.body.velocity.y > 0
-        );
-        sm.addTransition(
-            SLIMEG_STATE.WALK,
-            SLIMEG_STATE.FALL,
-            () => this.body.velocity.y > 0
-        );
-        sm.addTransition(
-            SLIMEG_STATE.STAND,
-            SLIMEG_STATE.FALL,
-            () => this.body.velocity.y > 0
-        );
-        // landing
-        sm.addTransition(
-            SLIMEG_STATE.FALL,
-            SLIMEG_STATE.STAND,
-            this.isOnGroundNotMoving.bind(this)
-        );
-        sm.addTransition(
-            SLIMEG_STATE.FALL,
-            SLIMEG_STATE.WALK,
-            this.isOnGroundMoving.bind(this)
-        );
-        this.stateMachine = sm;
     }
 
     preUpdate(time: number, delta: number) {
