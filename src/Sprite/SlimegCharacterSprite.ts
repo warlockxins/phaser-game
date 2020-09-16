@@ -43,7 +43,7 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
         super(scene, x, y);
         scene.sys.updateList.add(this);
         scene.sys.displayList.add(this);
-        this.setSize(45, 38);
+        this.setSize(20, 38);
 
         this.sprite = scene.add.sprite(0, 0, "slimeg", "slime1.png");
         this.sprite.setScale(0.2);
@@ -110,100 +110,78 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
         }
     }
 
+    isOnGroundNotMoving(): boolean {
+        return this.body.onFloor() && Math.abs(this.body.velocity.x) === 0;
+    }
+
+    isOnGroundMoving(): boolean {
+        return this.body.onFloor() && Math.abs(this.body.velocity.x) > 0;
+    }
+
+    shouldJump(): boolean {
+        return this.body.onFloor() && this.direction.up;
+    }
+
     createStateMachine() {
         const sm = new StateMachine();
-        sm.state(SLIMEG_STATE.STAND, new StandState(this));
-        sm.state(SLIMEG_STATE.WALK, new WalkState(this));
-        sm.state(SLIMEG_STATE.JUMP, new JumpState(this));
-        sm.state(SLIMEG_STATE.FALL, new FallState(this));
+        sm.addState(SLIMEG_STATE.STAND, new StandState(this));
+        sm.addState(SLIMEG_STATE.WALK, new WalkState(this));
+        sm.addState(SLIMEG_STATE.JUMP, new JumpState(this));
+        sm.addState(SLIMEG_STATE.FALL, new FallState(this));
         //-------TRANSITIONS-------
-        sm.transition(
-            "walking_to_standing",
+        sm.addTransition(
             SLIMEG_STATE.WALK,
             SLIMEG_STATE.STAND,
-            () => {
-                return (
-                    this.body.onFloor() && Math.abs(this.body.velocity.x) === 0
-                );
-            }
+            this.isOnGroundNotMoving.bind(this)
         );
-        sm.transition(
-            "standing_to_walking",
+        sm.addTransition(
             SLIMEG_STATE.STAND,
             SLIMEG_STATE.WALK,
-            () => {
-                return (
-                    this.body.onFloor() && Math.abs(this.body.velocity.x) > 0
-                );
-            }
+            this.isOnGroundMoving.bind(this)
         );
         //Jump
-        const jumpFunction = () => this.body.onFloor() && this.direction.up;
-        sm.transition(
-            "standing_to_jumping",
+        sm.addTransition(
             SLIMEG_STATE.STAND,
             SLIMEG_STATE.JUMP,
-            jumpFunction
+            this.shouldJump.bind(this)
         );
-        sm.transition(
-            "walking_to_jumping",
+        sm.addTransition(
             SLIMEG_STATE.WALK,
             SLIMEG_STATE.JUMP,
-            jumpFunction
+            this.shouldJump.bind(this)
         );
         // falling
-        sm.transition(
-            "jumping_to_falling",
+        sm.addTransition(
             SLIMEG_STATE.JUMP,
             SLIMEG_STATE.FALL,
-            () => {
-                return this.body.velocity.y > 0;
-            }
+            () => this.body.velocity.y > 0
         );
-        sm.transition(
-            "walking_to_falling",
+        sm.addTransition(
             SLIMEG_STATE.WALK,
             SLIMEG_STATE.FALL,
-            () => {
-                return this.body.velocity.y > 0;
-            }
+            () => this.body.velocity.y > 0
         );
-        sm.transition(
-            "standing_to_falling",
+        sm.addTransition(
             SLIMEG_STATE.STAND,
             SLIMEG_STATE.FALL,
-            () => {
-                return this.body.velocity.y > 0;
-            }
+            () => this.body.velocity.y > 0
         );
         // landing
-        sm.transition(
-            "falling_to_standing",
+        sm.addTransition(
             SLIMEG_STATE.FALL,
             SLIMEG_STATE.STAND,
-            () => {
-                return (
-                    this.body.onFloor() && Math.abs(this.body.velocity.x) < 2
-                );
-            }
+            this.isOnGroundNotMoving.bind(this)
         );
-        sm.transition(
-            "falling_to_walking",
+        sm.addTransition(
             SLIMEG_STATE.FALL,
             SLIMEG_STATE.WALK,
-            () => {
-                return (
-                    this.body.onFloor() && Math.abs(this.body.velocity.x) > 2
-                );
-            }
+            this.isOnGroundMoving.bind(this)
         );
         this.stateMachine = sm;
     }
 
-    // update(time, delta) {
     preUpdate(time: number, delta: number) {
         this.handleScriptComponents();
         this.stateMachine.update(delta);
-        // debugger;
     }
 }

@@ -5,8 +5,7 @@ export interface IStateMachineState {
 }
 
 export interface IStateMachineTransition {
-    name: string;
     fromState: number;
     toState: number;
-    predicate(): boolean;
+    guard(): boolean;
 }

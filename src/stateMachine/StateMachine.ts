@@ -21,7 +21,7 @@ export class StateMachine {
         this.context = {};
     }
 
-    state(index, smState: IStateMachineState) {
+    addState(index, smState: IStateMachineState) {
         if (!smState) {
             throw new Error("Missing State body: ");
         }
@@ -32,10 +32,7 @@ export class StateMachine {
         }
     }
 
-    transition(name: string, fromState: number, toState: number, predicate) {
-        if (!fromState && !toState && !predicate) {
-            return this.transitions[name];
-        }
+    addTransition(fromState: number, toState: number, predicate) {
         if (!this.states[fromState]) {
             throw new Error("Missing from state: " + fromState);
         }
@@ -43,15 +40,14 @@ export class StateMachine {
             throw new Error("Missing to state: " + toState);
         }
         const transition: IStateMachineTransition = {
-            name: name,
             fromState: fromState,
             toState: toState,
-            predicate: predicate,
+            guard: predicate,
         };
         this.transitions.push(transition);
     }
 
-    update(delta) {
+    update(delta: number) {
         const state = this.states[this.currentState];
 
         if (this.previousState !== this.currentState) {
@@ -69,7 +65,7 @@ export class StateMachine {
         for (const transition of this.transitions) {
             if (
                 transition.fromState === this.currentState &&
-                transition.predicate()
+                transition.guard()
             ) {
                 if (state.exit) {
                     state.exit();
