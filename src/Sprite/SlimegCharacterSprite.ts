@@ -30,16 +30,17 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
         scene.sys.updateList.add(this);
         scene.sys.displayList.add(this);
         this.setSize(20, 38);
+        // this.scaleX = -1;
 
         this.sprite = scene.add.sprite(0, 0, "slimeg", "slime1.png");
         this.sprite.setScale(0.2);
         this.sprite.setOrigin(0.5);
         this.add(this.sprite);
-        this.sprite.play("stand", true);
+        // this.sprite.play("stand", true);
         this.sprite.flipX = false;
 
         scene.physics.world.enableBody(this);
-        this.body.setMaxVelocity(140, 140);
+        this.body.setMaxVelocity(180, 240);
 
         this.direction = {
             left: false,
@@ -59,13 +60,17 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
     }
 
     createText() {
-        const style = {
-            font: "14px Arial",
-            fill: "#ff0044",
-            wordWrap: true,
-            wordWrapWidth: this.width,
+        const style: Phaser.Types.GameObjects.Text.TextStyle = {
+            fontFamily: "Arial",
+            fontSize: "14px",
+            color: "#ff0044",
+            // wordWrap: true,
+            // wordWrapWidth: this.width,
             align: "center",
             backgroundColor: "#ffff00",
+            padding: { x: 5, y: 5 },
+            // stroke: "#ff0000",
+            // strokeThickness: 2,
         };
 
         this.text = this.scene.add.text(

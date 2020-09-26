@@ -45,14 +45,27 @@ export class GameScene extends Phaser.Scene {
     }
 
     addSlimeAnimation() {
+        const logicLayer = this.map.getObjectLayer("logic");
+        const startPoint = logicLayer.objects.find(
+            (item) => item.name === "start"
+        );
+
+        const startX = startPoint?.x || 0;
+        const startY = startPoint?.y || 0;
+
         const components: ScriptComponent[] = [platformerInput];
         addAnimation(this, ANIMATIONS.slimeg);
-        this.slime = new SlimegCharacterSprite(this, 80, 200, components);
+        this.slime = new SlimegCharacterSprite(
+            this,
+            startX,
+            startY,
+            components
+        );
 
         this.cameras.main.startFollow(this.slime);
 
         this.movingSprites = this.physics.add.group({
-            collideWorldBounds: true,
+            // collideWorldBounds: true,
             dragX: 140,
         });
         this.movingSprites.add(this.slime);
@@ -63,17 +76,20 @@ export class GameScene extends Phaser.Scene {
 
         // The first parameter is the name of the tileset in Tiled and the second parameter is the key
         // of the tileset image used when loading the file in preload.
-        const tiles = this.map.addTilesetImage("sewer_tileset", "tiles");
+        const tiles: Phaser.Tilemaps.Tileset = this.map.addTilesetImage(
+            "levelProto",
+            "tiles"
+        );
 
         this.bottomLayer = this.map
-            .createStaticLayer("Bottom", [tiles], 0, 0)
+            .createStaticLayer("bottom", tiles, 0, 0)
             .setDepth(-1);
         this.topLayer = this.map
-            .createStaticLayer("Top", [tiles], 0, 0)
+            .createStaticLayer("main", tiles, 0, 0)
             .setDepth(-1);
 
-        this.bottomLayer.alpha = 0.5;
-        this.topLayer.alpha = 0.5;
+        // this.bottomLayer.alpha = 0.5;
+        // this.topLayer.alpha = 0.5;
 
         this.cameras.main.setBounds(
             0,
