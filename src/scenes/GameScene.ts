@@ -68,7 +68,19 @@ export class GameScene extends Phaser.Scene {
             // collideWorldBounds: true,
             dragX: 140,
         });
-        this.movingSprites.add(this.slime);
+        this.movingSprites.add(this.slime); 
+        this.addDeathZones();
+    }
+
+    addDeathZones() {
+        const zone = this.add.zone(300, 200).setSize(200, 200);
+        this.physics.world.enable(zone);
+        zone.body.setAllowGravity(false);
+        zone.body.moves = false;
+        this.physics.add.overlap(this.movingSprites, zone, (zoneItem, groupItem: SlimegCharacterSprite) => {
+            groupItem.kill();
+            this.movingSprites.remove(groupItem);
+        });
     }
 
     addLevel() {

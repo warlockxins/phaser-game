@@ -20,6 +20,8 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
 
     sprite!: Phaser.GameObjects.Sprite;
 
+    health = 100;
+
     constructor(
         scene: Phaser.Scene,
         x: number,
@@ -87,6 +89,11 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
         this.scriptComponents.forEach((component) => {
             component.update(this);
         });
+    }
+
+    kill() {
+        this.health = 0;
+        console.log('should destroy')
     }
 
     addWalkSpeed(increase: number) {

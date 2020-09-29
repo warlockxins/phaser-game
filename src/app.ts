@@ -14,13 +14,13 @@ const config: Phaser.Types.Core.GameConfig = {
     width: 800,
     height: 600,
     render: {
-        //        pixelArt: true,
+        pixelArt: true,
     },
     physics: {
         default: "arcade",
         arcade: {
             gravity: { y: 230 },
-            //   debug: true,
+           debug: true,
         },
     },
     scene: [LoadScene, MenuScene, GameScene],
