@@ -79,7 +79,7 @@ export class GameScene extends Phaser.Scene {
         zone.body.moves = false;
         this.physics.add.overlap(this.movingSprites, zone, (zoneItem, groupItem: SlimegCharacterSprite) => {
             groupItem.kill();
-            this.movingSprites.remove(groupItem);
+            // this.movingSprites.remove(groupItem);
         });
     }
 
