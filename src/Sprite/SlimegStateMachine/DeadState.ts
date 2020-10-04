@@ -9,6 +9,7 @@ export class DeadState implements IStateMachineState {
     enter(): void {
         this.slimeg.text.setText("dead");
         this.slimeg.sprite.flipY = true;
+        this.slimeg.body.setVelocityY(-150);
     }
     update(deltaTime: number): void {
     }

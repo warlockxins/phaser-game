@@ -30,18 +30,37 @@ export class GameScene extends Phaser.Scene {
         this.addLevel();
         this.addSlimeAnimation();
         this.setupPhysics();
+        this.setupCollectables(); 
+    }
+
+    setupCollectables() {
+        const logicLayer = this.map.getObjectLayer("logic");
+        const damageObject = logicLayer.objects.find(
+            (item) => item.name === "damage"
+        );
+        
+        this.addDeathZones(damageObject?.x, damageObject.y, damageObject?.width, damageObject?.height);
     }
 
     setupPhysics() {
         this.topLayer.setCollisionByProperty({ collision: true });
+        this.instantKillLayer.setCollisionByProperty({ instantKill: true});
+        
         this.physics.add.collider(
             this.movingSprites,
             this.topLayer
-            // (collider1, collider2) => {
-            // const body1: Phaser.Physics.Arcade.Body = collider1.body as Phaser.Physics.Arcade.Body;
-            // console.log(body1.blocked);
-            // }
         );
+        
+        // configure collision based on layer config
+        this.physics.add.collider(
+            this.movingSprites,
+            this.instantKillLayer,
+             (collider1, collider2) => {
+                 collider1.kill();
+                 this.movingSprites.remove(collider1);
+             }
+        );
+
     }
 
     addSlimeAnimation() {
@@ -69,17 +88,18 @@ export class GameScene extends Phaser.Scene {
             dragX: 140,
         });
         this.movingSprites.add(this.slime); 
-        this.addDeathZones();
     }
 
-    addDeathZones() {
-        const zone = this.add.zone(300, 200).setSize(200, 200);
+    addDeathZones(x, y, w, h) {
+        const zone = this.add.zone(x, y).setSize(w, h);
         this.physics.world.enable(zone);
+        zone.setOrigin(0, 0);
         zone.body.setAllowGravity(false);
         zone.body.moves = false;
         this.physics.add.overlap(this.movingSprites, zone, (zoneItem, groupItem: SlimegCharacterSprite) => {
-            groupItem.kill();
+            // groupItem.kill();
             // this.movingSprites.remove(groupItem);
+            groupItem.addDamage(1);
         });
     }
 
@@ -98,6 +118,10 @@ export class GameScene extends Phaser.Scene {
             .setDepth(-1);
         this.topLayer = this.map
             .createStaticLayer("main", tiles, 0, 0)
+            .setDepth(-1);
+        
+        this.instantKillLayer = this.map
+            .createStaticLayer("instantDeath", tiles, 0, 0)
             .setDepth(-1);
 
         // this.bottomLayer.alpha = 0.5;

@@ -7,7 +7,6 @@ export class StateMachine {
     initialState: number;
     currentState: number;
     previousState: number;
-    timer: any;
     context: { [key: string]: any };
 
     constructor() {
@@ -17,7 +16,6 @@ export class StateMachine {
         this.initialState = 0;
         this.currentState = 0;
         this.previousState = 0;
-        this.timer = null;
         this.context = {};
     }
 
@@ -52,7 +50,6 @@ export class StateMachine {
 
         if (this.previousState !== this.currentState) {
             if (state.enter) {
-                this.timer = new Date();
                 state.enter();
             }
             this.previousState = this.currentState;

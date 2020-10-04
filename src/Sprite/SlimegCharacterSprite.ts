@@ -21,6 +21,7 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
     sprite!: Phaser.GameObjects.Sprite;
 
     health = 100;
+    // implement damage Controller 
 
     constructor(
         scene: Phaser.Scene,
@@ -93,7 +94,15 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
 
     kill() {
         this.health = 0;
-        console.log('should destroy')
+        //  console.log('should destroy')
+    }
+
+    addDamage(amount: number) {
+        this.health -= amount;
+
+        if (this.health > 0) {
+            console.log('should live - temporarily immortal');
+        }
     }
 
     addWalkSpeed(increase: number) {
