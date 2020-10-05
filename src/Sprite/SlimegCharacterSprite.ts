@@ -2,6 +2,7 @@ import { StateMachine } from "../stateMachine/StateMachine";
 import { SlimegStateMachine } from "./SlimegStateMachine";
 
 import { ScriptComponent } from "../scriptComponent/scriptComponent";
+import {DamageController} from './DamageController';
 
 interface MoveDirection {
     left: boolean;
@@ -20,8 +21,10 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
 
     sprite!: Phaser.GameObjects.Sprite;
 
-    health = 100;
-    // implement damage Controller 
+    health = 3;
+    damageController: DamageController;
+
+    blinkTween = undefined;
 
     constructor(
         scene: Phaser.Scene,
@@ -33,14 +36,25 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
         scene.sys.updateList.add(this);
         scene.sys.displayList.add(this);
         this.setSize(20, 38);
-        // this.scaleX = -1;
 
         this.sprite = scene.add.sprite(0, 0, "slimeg", "slime1.png");
         this.sprite.setScale(0.2);
         this.sprite.setOrigin(0.5);
         this.add(this.sprite);
-        // this.sprite.play("stand", true);
         this.sprite.flipX = false;
+
+        this.blinkTween = scene.tweens.add({
+            targets: this.sprite,
+            alpha: {
+                getStart: () => 1,
+                getEnd: () => 0.2 
+            }, 
+            duration: 100,
+            ease: 'Power1',
+            yoyo: true,
+            repeat: 3,
+            paused: true
+        });
 
         scene.physics.world.enableBody(this);
         this.body.setMaxVelocity(180, 240);
@@ -60,6 +74,8 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
 
         this.stateMachine = new SlimegStateMachine(this);
         this.createText();
+
+        this.damageController = new DamageController(this);
     }
 
     createText() {
@@ -94,15 +110,10 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
 
     kill() {
         this.health = 0;
-        //  console.log('should destroy')
     }
 
     addDamage(amount: number) {
-        this.health -= amount;
-
-        if (this.health > 0) {
-            console.log('should live - temporarily immortal');
-        }
+        this.damageController.addDamage(amount);  
     }
 
     addWalkSpeed(increase: number) {
