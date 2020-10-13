@@ -116,16 +116,17 @@ export class GameScene extends Phaser.Scene {
         this.bottomLayer = this.map
             .createStaticLayer("bottom", tiles, 0, 0)
             .setDepth(-1);
+        
         this.topLayer = this.map
             .createStaticLayer("main", tiles, 0, 0)
             .setDepth(-1);
-        
+        console.log("-", this.topLayer.layer.properties[0].value , Phaser.Display.Color.HexStringToColor(this.topLayer.layer.properties[0].value.substring(1, 7)));
+        this.cameras.main.backgroundColor = Phaser.Display.Color.HexStringToColor(this.topLayer.layer.properties[0].value);
+        //        this.cameras.main.backgroundColor.setTo(56, 95, 255);
+
         this.instantKillLayer = this.map
             .createStaticLayer("instantDeath", tiles, 0, 0)
             .setDepth(-1);
-
-        // this.bottomLayer.alpha = 0.5;
-        // this.topLayer.alpha = 0.5;
 
         this.cameras.main.setBounds(
             0,
