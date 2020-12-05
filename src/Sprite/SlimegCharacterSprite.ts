@@ -126,6 +126,10 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
         }
     }
 
+    isOnGround(): boolean {
+        return this.body.onFloor(); 
+    }
+    
     isOnGroundNotMoving(): boolean {
         return this.body.onFloor() && Math.abs(this.body.velocity.x) === 0;
     }

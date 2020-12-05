@@ -12,15 +12,18 @@ import { GameScene } from "./scenes/GameScene";
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
     width: 800,
-    height: 600,
+    height: 500,
     render: {
+        antialiasGL: false,
+        antialias: false,
         pixelArt: true,
+        roundPixels: true
     },
     physics: {
         default: "arcade",
         arcade: {
-            gravity: { y: 230 },
-           debug: true,
+            gravity: { y: 230 }//,
+            debug: true,
         },
     },
     scene: [LoadScene, MenuScene, GameScene],

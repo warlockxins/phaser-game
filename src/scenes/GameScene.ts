@@ -1,4 +1,7 @@
 // https://www.emanueleferonato.com/2019/01/23/html5-endless-runner-built-with-phaser-and-arcade-physics-step-5-adding-deadly-fire-being-kind-with-players-by-setting-its-body-smaller-than-the-image/
+
+// animating tiles here
+// https://medium.com/@junhongwang/tiled-generated-map-with-phaser-3-d2c16ffe75b6
 import { CST } from "../constants/CST";
 import { addAnimation, SlimegCharacterSprite } from "../Sprite";
 import { ANIMATIONS } from "../animation";
@@ -26,6 +29,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     preload() {}
+    
     create() {
         this.addLevel();
         this.addSlimeAnimation();
@@ -81,7 +85,7 @@ export class GameScene extends Phaser.Scene {
             components
         );
 
-        this.cameras.main.startFollow(this.slime);
+        this.cameras.main.startFollow(this.slime, true, 0.1, 0.1);
 
         this.movingSprites = this.physics.add.group({
             // collideWorldBounds: true,
@@ -114,15 +118,14 @@ export class GameScene extends Phaser.Scene {
         );
 
         this.bottomLayer = this.map
-            .createStaticLayer("bottom", tiles, 0, 0)
+            .createDynamicLayer("bottom", tiles, 0, 0)
             .setDepth(-1);
         
         this.topLayer = this.map
             .createStaticLayer("main", tiles, 0, 0)
             .setDepth(-1);
-        console.log("-", this.topLayer.layer.properties[0].value , Phaser.Display.Color.HexStringToColor(this.topLayer.layer.properties[0].value.substring(1, 7)));
+        
         this.cameras.main.backgroundColor = Phaser.Display.Color.HexStringToColor(this.topLayer.layer.properties[0].value);
-        //        this.cameras.main.backgroundColor.setTo(56, 95, 255);
 
         this.instantKillLayer = this.map
             .createStaticLayer("instantDeath", tiles, 0, 0)
@@ -134,5 +137,6 @@ export class GameScene extends Phaser.Scene {
             this.map.widthInPixels,
             this.map.heightInPixels
         );
+        this.cameras.main.setOrigin(0.1, 1);
     }
 }
