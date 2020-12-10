@@ -31,26 +31,29 @@ export class GroundedState implements IStateMachineState {
         this.machine.addTransition(
             STATES.WALK,
             STATES.STAND,
-            slimeg.isOnGroundNotMoving.bind(slimeg)
+            slimeg.hasNoHorizontalSpeed.bind(slimeg)
         );
 
         this.machine.addTransition(
             STATES.STAND,
             STATES.WALK,
-            slimeg.isOnGroundMoving.bind(slimeg)
+            () => !slimeg.hasNoHorizontalSpeed()
         );
     }
 
     enter(): void {
         // reset machine previousState
         this.machine.previousState = -1;
+
+        this.machine.currentState = this.slimeg.hasNoHorizontalSpeed() ? STATES.WALK : STATES.STAND;
     }
 
     update(deltaTime: number): void {
-        this.machine.update(deltaTime);
         if (this.slimeg.direction.up) {
-             this.slimeg.body.setVelocityY(-350);
+            this.slimeg.jump();
         }
+
+        this.machine.update(deltaTime);
     }
 
     exit(): void {}

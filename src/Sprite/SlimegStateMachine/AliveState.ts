@@ -2,7 +2,7 @@ import { StateMachine } from "../../stateMachine/StateMachine";
 import { IStateMachineState } from "../../stateMachine/interfaces";
 import { SlimegCharacterSprite } from "../SlimegCharacterSprite";
 import { GroundedState } from './GroundedState';
-import { AirbornState } from './AirbornState';
+import { AirbornState } from './airborn/AirbornState';
 
 enum STATES {
     GROUNDED,
@@ -11,9 +11,11 @@ enum STATES {
 
 export class AliveState implements IStateMachineState {
     machine: StateMachine;
+    character: SlimegCharacterSprite;
 
     constructor(slimeg: SlimegCharacterSprite) {
         this.machine = new StateMachine();
+        this.character = slimeg;
 
         this.machine.addState(
             STATES.GROUNDED,
@@ -43,6 +45,10 @@ export class AliveState implements IStateMachineState {
     }
 
     update(deltaTime: number): void {
+        if (this.character.direction.fire) {
+            this.character.fire();
+        }
+
         this.machine.update(deltaTime);
     }
 

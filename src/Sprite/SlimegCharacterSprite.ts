@@ -4,11 +4,14 @@ import { SlimegStateMachine } from "./SlimegStateMachine";
 import { ScriptComponent } from "../scriptComponent/scriptComponent";
 import {DamageController} from './DamageController';
 
+import {Bullet} from "./Bullet";
+
 interface MoveDirection {
     left: boolean;
     right: boolean;
     up: boolean;
     down: boolean;
+    fire: boolean;
 }
 
 export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
@@ -64,6 +67,7 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
             right: false,
             up: false,
             down: false,
+            fire: false
         };
 
         this.scriptComponents = scriptComponents;
@@ -76,6 +80,7 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
         this.createText();
 
         this.damageController = new DamageController(this);
+        
     }
 
     createText() {
@@ -95,7 +100,7 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
         this.text = this.scene.add.text(
             0,
             -40,
-            "- text on a sprite -\ndrag me",
+            "",
             style
         );
         this.text.setOrigin(0.5);
@@ -129,17 +134,25 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
     isOnGround(): boolean {
         return this.body.onFloor(); 
     }
-    
-    isOnGroundNotMoving(): boolean {
-        return this.body.onFloor() && Math.abs(this.body.velocity.x) === 0;
+
+    hasNoHorizontalSpeed(): boolean {
+        return Math.abs(this.body.velocity.x) === 0;
     }
 
-    isOnGroundMoving(): boolean {
-        return this.body.onFloor() && Math.abs(this.body.velocity.x) > 0;
+    jump(): boolean {
+        this.body.setVelocityY(-350);
     }
 
-    shouldJump(): boolean {
-        return this.body.onFloor() && this.direction.up;
+    fire() {
+        if (this.bullet) return;
+        this.bullet = true;
+        setTimeout(() => {
+            this.bullet = false;
+        }, 100);
+
+        const dir = this.sprite.flipX ? 1: -1;
+        const xPos = this.x + (20 * dir);
+        new Bullet(this.scene, xPos, this.y + 5, dir); 
     }
 
     preUpdate(time: number, delta: number) {

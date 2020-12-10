@@ -137,6 +137,6 @@ export class GameScene extends Phaser.Scene {
             this.map.widthInPixels,
             this.map.heightInPixels
         );
-        this.cameras.main.setOrigin(0.1, 1);
+        //   this.cameras.main.setOrigin(0.1, 1);
     }
 }

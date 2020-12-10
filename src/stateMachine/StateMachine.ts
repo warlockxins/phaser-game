@@ -72,4 +72,13 @@ export class StateMachine {
             }
         }
     }
+
+    exitCurrentState() {
+        const state = this.states[this.currentState];
+
+        if (state?.exit) {
+            state.exit();
+            this.previousState = -1;
+        }
+    }
 }
