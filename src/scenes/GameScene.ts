@@ -16,6 +16,8 @@ export class GameScene extends Phaser.Scene {
     bottomLayer!: Phaser.Tilemaps.StaticTilemapLayer;
     movingSprites!: Phaser.Physics.Arcade.Group;
 
+    playerBulletGroup: Phaser.Physics.Arcade.Group;
+
     slime?: SlimegCharacterSprite;
 
     constructor() {
@@ -65,6 +67,14 @@ export class GameScene extends Phaser.Scene {
              }
         );
 
+        this.physics.add.collider(
+            this.playerBulletGroup,
+            this.topLayer,
+            (bullet, c2) => {
+                bullet.destroy();
+            }
+        );
+
     }
 
     addSlimeAnimation() {
@@ -92,6 +102,8 @@ export class GameScene extends Phaser.Scene {
             dragX: 140,
         });
         this.movingSprites.add(this.slime); 
+
+        this.playerBulletGroup = this.physics.add.group({ allowGravity: false });
     }
 
     addDeathZones(x, y, w, h) {

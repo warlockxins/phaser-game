@@ -105,6 +105,7 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
         );
         this.text.setOrigin(0.5);
         this.add(this.text);
+        this.text.setVisible(false);
     }
 
     handleScriptComponents() {
@@ -151,8 +152,9 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
         }, 100);
 
         const dir = this.sprite.flipX ? 1: -1;
-        const xPos = this.x + (20 * dir);
-        new Bullet(this.scene, xPos, this.y + 5, dir); 
+        const xPos = this.x + (10 * dir);
+        const bulleInstancet = new Bullet(this.scene, xPos, this.y + 5, dir); 
+        this.scene.playerBulletGroup.add(bulleInstancet);
     }
 
     preUpdate(time: number, delta: number) {
