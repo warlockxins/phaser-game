@@ -9,6 +9,7 @@ import { ANIMATIONS } from "../animation";
 import { ScriptComponent } from "../scriptComponent/scriptComponent";
 import { platformerInput } from "../scriptComponent/platformerInput";
 import { platformerInputBot } from "../scriptComponent/platformerInputBot";
+import { AnimatedTile } from '../levelComponents/AnimatedTile';
 
 export class GameScene extends Phaser.Scene {
     map!: Phaser.Tilemaps.Tilemap;
@@ -19,6 +20,8 @@ export class GameScene extends Phaser.Scene {
     playerBulletGroup: Phaser.Physics.Arcade.Group;
 
     slime?: SlimegCharacterSprite;
+    
+    private animatedTiles: AnimatedTile[];
 
     constructor() {
         super({
@@ -28,6 +31,7 @@ export class GameScene extends Phaser.Scene {
 
     init(data) {
         console.log("data passed to this scene", data);
+        this.animatedTiles = [];
     }
 
     preload() {}
@@ -128,13 +132,14 @@ export class GameScene extends Phaser.Scene {
             "levelProto",
             "tiles"
         );
+        this.tileset = tiles;
 
         this.bottomLayer = this.map
             .createDynamicLayer("bottom", tiles, 0, 0)
             .setDepth(-1);
         
         this.topLayer = this.map
-            .createStaticLayer("main", tiles, 0, 0)
+            .createDynamicLayer("main", tiles, 0, 0)
             .setDepth(-1);
         
         this.cameras.main.backgroundColor = Phaser.Display.Color.HexStringToColor(this.topLayer.layer.properties[0].value);
@@ -150,5 +155,39 @@ export class GameScene extends Phaser.Scene {
             this.map.heightInPixels
         );
         //   this.cameras.main.setOrigin(0.1, 1);
+        
+        this.createAnimatedTiles();
+    }
+
+    createAnimatedTiles() {
+        const tileset = this.tileset;       
+        const tileData = tileset.tileData as TilesetTileData;
+
+          for (let tileid in tileData) {
+            this.map.layers.forEach(layer => {
+                if (layer.tilemapLayer.type === "StaticTilemapLayer") {
+                    console.log('ignoring', layer.name);
+                    return;
+                }
+              layer.data.forEach(tileRow => {
+                tileRow.forEach(tile => {
+                  if (tile.index - tileset.firstgid === parseInt(tileid, 10)) {
+                    this.animatedTiles.push(
+                      new AnimatedTile(
+                        tile,
+                        tileData[tileid].animation,
+                        tileset.firstgid
+                      )
+                    );
+                  }
+                });
+              });
+            });
+          };
+    }
+
+    update(time: number, delta: number) {
+        super.update(time, delta);
+        this.animatedTiles.forEach(tile => tile.update(delta));
     }
 }
