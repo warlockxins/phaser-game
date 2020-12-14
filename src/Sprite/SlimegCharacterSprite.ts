@@ -60,7 +60,7 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
         });
 
         scene.physics.world.enableBody(this);
-        this.body.setMaxVelocity(180, 240);
+        this.body.setMaxVelocity(180, 280);
 
         this.direction = {
             left: false,
@@ -141,7 +141,7 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
     }
 
     jump(): boolean {
-        this.body.setVelocityY(-350);
+        this.body.setVelocityY(-600);
     }
 
     fire() {

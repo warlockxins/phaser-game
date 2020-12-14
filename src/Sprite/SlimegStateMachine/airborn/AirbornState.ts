@@ -45,13 +45,21 @@ export class AirbornState implements IStateMachineState {
         // set previousState to non existent to trigger on start for new substate
         this.machine.previousState = -1;
         this.machine.currentState =  this.slimeg.body.velocity.y >= 0 ? STATES.FALL : STATES.JUMP;
+        //this.slimeg.body.setSize(5, 38);
     }
 
     update(deltaTime: number): void {
         this.machine.update(deltaTime);
+        const dir = this.slimeg.sprite.flipX ? 1 : -1;
+        // 10 is max angle, by max speed
+        const coeff = this.slimeg.body.velocity.y /this.slimeg.body.maxVelocity.y * 10; 
+
+        this.slimeg.sprite.setRotation(dir * coeff * 3.14 / 180);
     }
 
     exit(): void {
         this.machine.exitCurrentState();
+        this.slimeg.sprite.setRotation(0);
+        //this.slimeg.body.setSize(20, 38);
     }
 }
