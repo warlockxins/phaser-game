@@ -9,19 +9,15 @@ import { ANIMATIONS } from "../animation";
 import { ScriptComponent } from "../scriptComponent/scriptComponent";
 import { platformerInput } from "../scriptComponent/platformerInput";
 import { platformerInputBot } from "../scriptComponent/platformerInputBot";
-import { AnimatedTile } from '../levelComponents/AnimatedTile';
+import { AnimatedTileSceneBase } from "./AnimatedTileSceneBase";
 
-export class GameScene extends Phaser.Scene {
-    map!: Phaser.Tilemaps.Tilemap;
-    topLayer!: Phaser.Tilemaps.StaticTilemapLayer;
-    bottomLayer!: Phaser.Tilemaps.StaticTilemapLayer;
+export class GameScene extends AnimatedTileSceneBase {
     movingSprites!: Phaser.Physics.Arcade.Group;
-
-    playerBulletGroup: Phaser.Physics.Arcade.Group;
+    playerBulletGroup!: Phaser.Physics.Arcade.Group;
 
     slime?: SlimegCharacterSprite;
-    
-    private animatedTiles: AnimatedTile[];
+
+    instantKillLayer!: Phaser.Tilemaps.StaticTilemapLayer;
 
     constructor() {
         super({
@@ -31,16 +27,26 @@ export class GameScene extends Phaser.Scene {
 
     init(data) {
         console.log("data passed to this scene", data);
-        this.animatedTiles = [];
     }
 
-    preload() {}
-    
+    preload() {
+
+    }
+
     create() {
+        this.addGroups();
         this.addLevel();
         this.addSlimeAnimation();
         this.setupPhysics();
-        this.setupCollectables(); 
+        this.setupCollectables();
+    }
+
+    addGroups() {
+        this.playerBulletGroup = this.physics.add.group({ allowGravity: false });
+        this.movingSprites = this.physics.add.group({
+            // collideWorldBounds: true,
+            dragX: 140,
+        });
     }
 
     setupCollectables() {
@@ -48,27 +54,28 @@ export class GameScene extends Phaser.Scene {
         const damageObject = logicLayer.objects.find(
             (item) => item.name === "damage"
         );
-        
-        this.addDeathZones(damageObject?.x, damageObject.y, damageObject?.width, damageObject?.height);
+
+        damageObject &&
+            this.addDeathZones(damageObject?.x, damageObject.y, damageObject?.width, damageObject?.height);
     }
 
     setupPhysics() {
         this.topLayer.setCollisionByProperty({ collision: true });
-        this.instantKillLayer.setCollisionByProperty({ instantKill: true});
-        
+        this.instantKillLayer.setCollisionByProperty({ instantKill: true });
+
         this.physics.add.collider(
             this.movingSprites,
             this.topLayer
         );
-        
+
         // configure collision based on layer config
         this.physics.add.collider(
             this.movingSprites,
             this.instantKillLayer,
-             (collider1, collider2) => {
-                 collider1.kill();
-                 this.movingSprites.remove(collider1);
-             }
+            (collider1, collider2) => {
+                (<SlimegCharacterSprite>collider1).kill();
+                this.movingSprites.remove(collider1);
+            }
         );
 
         this.physics.add.collider(
@@ -100,14 +107,7 @@ export class GameScene extends Phaser.Scene {
         );
 
         this.cameras.main.startFollow(this.slime, true, 0.1, 0.1);
-
-        this.movingSprites = this.physics.add.group({
-            // collideWorldBounds: true,
-            dragX: 140,
-        });
-        this.movingSprites.add(this.slime); 
-
-        this.playerBulletGroup = this.physics.add.group({ allowGravity: false });
+        this.movingSprites.add(this.slime);
     }
 
     addDeathZones(x, y, w, h) {
@@ -132,16 +132,17 @@ export class GameScene extends Phaser.Scene {
             "levelProto",
             "tiles"
         );
+
         this.tileset = tiles;
 
         this.bottomLayer = this.map
             .createDynamicLayer("bottom", tiles, 0, 0)
             .setDepth(-1);
-        
+
         this.topLayer = this.map
             .createDynamicLayer("main", tiles, 0, 0)
             .setDepth(-1);
-        
+
         this.cameras.main.backgroundColor = Phaser.Display.Color.HexStringToColor(this.topLayer.layer.properties[0].value);
 
         this.instantKillLayer = this.map
@@ -155,39 +156,11 @@ export class GameScene extends Phaser.Scene {
             this.map.heightInPixels
         );
         //   this.cameras.main.setOrigin(0.1, 1);
-        
+
         this.createAnimatedTiles();
-    }
-
-    createAnimatedTiles() {
-        const tileset = this.tileset;       
-        const tileData = tileset.tileData as TilesetTileData;
-
-          for (let tileid in tileData) {
-            this.map.layers.forEach(layer => {
-                if (layer.tilemapLayer.type === "StaticTilemapLayer") {
-                    console.log('ignoring', layer.name);
-                    return;
-                }
-              layer.data.forEach(tileRow => {
-                tileRow.forEach(tile => {
-                  if (tile.index - tileset.firstgid === parseInt(tileid, 10)) {
-                    this.animatedTiles.push(
-                      new AnimatedTile(
-                        tile,
-                        tileData[tileid].animation,
-                        tileset.firstgid
-                      )
-                    );
-                  }
-                });
-              });
-            });
-          };
     }
 
     update(time: number, delta: number) {
         super.update(time, delta);
-        this.animatedTiles.forEach(tile => tile.update(delta));
     }
 }

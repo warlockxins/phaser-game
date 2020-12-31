@@ -26,7 +26,7 @@ const config: Phaser.Types.Core.GameConfig = {
             debug: true,
         },
     },
-    scene: [LoadScene, MenuScene, GameScene],
+     scene: [LoadScene, MenuScene, GameScene],
 };
 
 new Phaser.Game(config);

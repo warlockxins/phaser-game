@@ -1,10 +1,11 @@
+import d from 'dijkstra';
 import { StateMachine } from "../stateMachine/StateMachine";
 import { SlimegStateMachine } from "./SlimegStateMachine";
 
 import { ScriptComponent } from "../scriptComponent/scriptComponent";
-import {DamageController} from './DamageController';
+import { DamageController } from './DamageController';
 
-import {Bullet} from "./Bullet";
+import { Bullet } from "./Bullet";
 
 interface MoveDirection {
     left: boolean;
@@ -50,8 +51,8 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
             targets: this.sprite,
             alpha: {
                 getStart: () => 1,
-                getEnd: () => 0.2 
-            }, 
+                getEnd: () => 0.2
+            },
             duration: 100,
             ease: 'Power1',
             yoyo: true,
@@ -80,7 +81,7 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
         this.createText();
 
         this.damageController = new DamageController(this);
-        
+
     }
 
     createText() {
@@ -119,7 +120,7 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
     }
 
     addDamage(amount: number) {
-        this.damageController.addDamage(amount);  
+        this.damageController.addDamage(amount);
     }
 
     addWalkSpeed(increase: number) {
@@ -133,7 +134,7 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
     }
 
     isOnGround(): boolean {
-        return this.body.onFloor(); 
+        return this.body.onFloor();
     }
 
     hasNoHorizontalSpeed(): boolean {
@@ -151,9 +152,9 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
             this.bullet = false;
         }, 100);
 
-        const dir = this.sprite.flipX ? 1: -1;
+        const dir = this.sprite.flipX ? 1 : -1;
         const xPos = this.x + (10 * dir);
-        const bulleInstancet = new Bullet(this.scene, xPos, this.y + 5, dir); 
+        const bulleInstancet = new Bullet(this.scene, xPos, this.y + 5, dir);
         this.scene.playerBulletGroup.add(bulleInstancet);
     }
 

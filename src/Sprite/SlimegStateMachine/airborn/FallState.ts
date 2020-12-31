@@ -3,8 +3,8 @@ import { SlimegCharacterSprite } from "../../SlimegCharacterSprite";
 
 export class FallState implements IStateMachineState {
     slimeg: SlimegCharacterSprite;
-    fallDeath: boolean;
-    timer: undefined;
+    fallDeath: boolean = false;
+    timer: number | undefined;
 
     constructor(slimeg: SlimegCharacterSprite) {
         this.slimeg = slimeg;
@@ -14,10 +14,10 @@ export class FallState implements IStateMachineState {
         this.slimeg.text.setText("falling");
 
         this.fallDeath = false;
-        
+
         this.timer = setTimeout(() => {
             this.fallDeath = true;
-            this.timer = null;
+            this.timer = undefined;
         }, 2000);
 
     }
