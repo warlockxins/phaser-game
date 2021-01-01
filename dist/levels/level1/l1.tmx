@@ -100,7 +100,7 @@
   </data>
  </layer>
  <objectgroup id="8" name="logic">
-  <object id="2" name="start" x="334.419" y="378.446">
+  <object id="2" name="start" x="2375.18" y="475.206">
    <point/>
   </object>
   <object id="3" name="coin" type="coin" gid="3" x="570.532" y="329.537" width="30" height="30"/>

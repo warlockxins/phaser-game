@@ -9,7 +9,7 @@ import { ANIMATIONS } from "../animation";
 import { ScriptComponent } from "../scriptComponent/scriptComponent";
 import { platformerInput } from "../scriptComponent/platformerInput";
 import { platformerInputBot } from "../scriptComponent/platformerInputBot";
-import { AnimatedTileSceneBase } from "./AnimatedTileSceneBase";
+import { AnimatedTileSceneBase } from "../levelComponents/AnimatedTileSceneBase";
 
 export class GameScene extends AnimatedTileSceneBase {
     movingSprites!: Phaser.Physics.Arcade.Group;
@@ -30,33 +30,58 @@ export class GameScene extends AnimatedTileSceneBase {
     }
 
     preload() {
-
     }
 
     create() {
         this.addGroups();
         this.addLevel();
-        this.addSlimeAnimation();
+        this.addPlayer();
         this.setupPhysics();
-        this.setupCollectables();
+        this.setupDamageBlock();
+        this.createAnimatedTiles();
+
+        this.physics.world.setBounds(this.topLayer.displayOriginX,
+            this.topLayer.displayOriginY,
+            this.topLayer.displayWidth,
+            this.topLayer.displayHeight
+        );
+
+        this.createCollectables();
+    }
+
+    createCollectables() {
+        const tileTexture: Phaser.Textures.Texture = this.textures.list["tiles"];
+        tileTexture.add('bugLowRight', 0, 60, 0, 30, 30);
+
+        const coinId = 3;
+        const idForEmpty = -1;
+
+        const surpriseBox = this.map.createFromTiles(
+            coinId, idForEmpty,
+            {
+                origin: {
+                    x: 0,
+                    y: 0
+                },
+                key: 'tiles',
+                frame: 'bugLowRight',
+            },
+            this, undefined, this.topLayer
+        );
     }
 
     addGroups() {
         this.playerBulletGroup = this.physics.add.group({ allowGravity: false });
         this.movingSprites = this.physics.add.group({
-            // collideWorldBounds: true,
+            collideWorldBounds: true,
             dragX: 140,
         });
     }
 
-    setupCollectables() {
-        const logicLayer = this.map.getObjectLayer("logic");
-        const damageObject = logicLayer.objects.find(
-            (item) => item.name === "damage"
-        );
-
+    setupDamageBlock() {
+        const damageObject = this.getLogicObject('damage');
         damageObject &&
-            this.addDeathZones(damageObject?.x, damageObject.y, damageObject?.width, damageObject?.height);
+            this.addDeathZones(damageObject?.x, damageObject?.y, damageObject?.width, damageObject?.height);
     }
 
     setupPhysics() {
@@ -88,21 +113,25 @@ export class GameScene extends AnimatedTileSceneBase {
 
     }
 
-    addSlimeAnimation() {
-        const logicLayer = this.map.getObjectLayer("logic");
-        const startPoint = logicLayer.objects.find(
-            (item) => item.name === "start"
-        );
+    getLogicObject(key: string) {
+        return this.map.getObjectLayer("logic")
+            .objects.find(
+                (item) => item.name === key);
+    }
 
-        const startX = startPoint?.x || 0;
-        const startY = startPoint?.y || 0;
+    addPlayer() {
+        const startPoint = this.getLogicObject('start');
+
+        if (!startPoint) {
+            return;
+        }
 
         const components: ScriptComponent[] = [platformerInput];
         addAnimation(this, ANIMATIONS.slimeg);
         this.slime = new SlimegCharacterSprite(
             this,
-            startX,
-            startY,
+            startPoint.x || 0,
+            startPoint.y || 0,
             components
         );
 
@@ -110,16 +139,16 @@ export class GameScene extends AnimatedTileSceneBase {
         this.movingSprites.add(this.slime);
     }
 
-    addDeathZones(x, y, w, h) {
-        const zone = this.add.zone(x, y).setSize(w, h);
+    addDeathZones(x: number = 0, y: number = 0, w: number = 0, h: number = 0) {
+        const zone = this.add.zone(x, y, w, h);
         this.physics.world.enable(zone);
         zone.setOrigin(0, 0);
-        zone.body.setAllowGravity(false);
-        zone.body.moves = false;
-        this.physics.add.overlap(this.movingSprites, zone, (zoneItem, groupItem: SlimegCharacterSprite) => {
+        (<Phaser.Physics.Arcade.Body>zone.body).setAllowGravity(false);
+        (<Phaser.Physics.Arcade.Body>zone.body).moves = false;
+        this.physics.add.overlap(this.movingSprites, zone, (zoneItem, groupItem) => {
             // groupItem.kill();
             // this.movingSprites.remove(groupItem);
-            groupItem.addDamage(1);
+            (<SlimegCharacterSprite>groupItem).addDamage(1);
         });
     }
 
@@ -128,25 +157,23 @@ export class GameScene extends AnimatedTileSceneBase {
 
         // The first parameter is the name of the tileset in Tiled and the second parameter is the key
         // of the tileset image used when loading the file in preload.
-        const tiles: Phaser.Tilemaps.Tileset = this.map.addTilesetImage(
+        this.tileset = this.map.addTilesetImage(
             "levelProto",
             "tiles"
         );
 
-        this.tileset = tiles;
-
         this.bottomLayer = this.map
-            .createDynamicLayer("bottom", tiles, 0, 0)
+            .createDynamicLayer("bottom", this.tileset, 0, 0)
             .setDepth(-1);
 
         this.topLayer = this.map
-            .createDynamicLayer("main", tiles, 0, 0)
+            .createDynamicLayer("main", this.tileset, 0, 0)
             .setDepth(-1);
 
         this.cameras.main.backgroundColor = Phaser.Display.Color.HexStringToColor(this.topLayer.layer.properties[0].value);
 
         this.instantKillLayer = this.map
-            .createStaticLayer("instantDeath", tiles, 0, 0)
+            .createStaticLayer("instantDeath", this.tileset, 0, 0)
             .setDepth(-1);
 
         this.cameras.main.setBounds(
@@ -156,8 +183,6 @@ export class GameScene extends AnimatedTileSceneBase {
             this.map.heightInPixels
         );
         //   this.cameras.main.setOrigin(0.1, 1);
-
-        this.createAnimatedTiles();
     }
 
     update(time: number, delta: number) {

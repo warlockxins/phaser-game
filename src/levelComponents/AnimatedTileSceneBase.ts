@@ -22,13 +22,12 @@ export class AnimatedTileSceneBase extends Phaser.Scene {
 
         for (let tileid in tileData) {
             this.map.layers.forEach(layer => {
-                if (layer.tilemapLayer.type === "StaticTilemapLayer") {
-                    console.log('ignoring', layer.name);
-                    return;
+                if (layer.tilemapLayer.type !== "StaticTilemapLayer") {
+
+                    layer.data.forEach(tileRow => {
+                        this.makeAnimationForRow(tileRow, tileid);
+                    });
                 }
-                layer.data.forEach(tileRow => {
-                    this.makeAnimationForRow(tileRow, tileid);
-                });
             });
         };
     }
