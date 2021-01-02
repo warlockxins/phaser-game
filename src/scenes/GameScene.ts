@@ -10,14 +10,15 @@ import { ScriptComponent } from "../scriptComponent/scriptComponent";
 import { platformerInput } from "../scriptComponent/platformerInput";
 import { platformerInputBot } from "../scriptComponent/platformerInputBot";
 import { AnimatedTileSceneBase } from "../levelComponents/AnimatedTileSceneBase";
+import { DestructableTileManager } from "~/levelComponents/DestructableTileManager";
 
 export class GameScene extends AnimatedTileSceneBase {
     movingSprites!: Phaser.Physics.Arcade.Group;
     playerBulletGroup!: Phaser.Physics.Arcade.Group;
-
     slime?: SlimegCharacterSprite;
-
     instantKillLayer!: Phaser.Tilemaps.StaticTilemapLayer;
+
+    destructableTileManager!: DestructableTileManager;
 
     constructor() {
         super({
@@ -50,24 +51,7 @@ export class GameScene extends AnimatedTileSceneBase {
     }
 
     createCollectables() {
-        const tileTexture: Phaser.Textures.Texture = this.textures.list["tiles"];
-        tileTexture.add('bugLowRight', 0, 60, 0, 30, 30);
-
-        const coinId = 3;
-        const idForEmpty = -1;
-
-        const surpriseBox = this.map.createFromTiles(
-            coinId, idForEmpty,
-            {
-                origin: {
-                    x: 0,
-                    y: 0
-                },
-                key: 'tiles',
-                frame: 'bugLowRight',
-            },
-            this, undefined, this.topLayer
-        );
+        this.destructableTileManager = new DestructableTileManager(this.map, this.topLayer, 'tiles', this);
     }
 
     addGroups() {
@@ -106,11 +90,16 @@ export class GameScene extends AnimatedTileSceneBase {
         this.physics.add.collider(
             this.playerBulletGroup,
             this.topLayer,
-            (bullet, c2) => {
+            (bullet, _c2) => {
                 bullet.destroy();
+
+                const tileDestroyed = this.destructableTileManager.trigger((<Phaser.Tilemaps.Tile><unknown>_c2));
+                if (tileDestroyed) {
+                    const { pixelY, pixelX } = (<Phaser.Tilemaps.Tile><unknown>_c2);
+                    console.log('====> sparks at', pixelX, pixelY);
+                }
             }
         );
-
     }
 
     getLogicObject(key: string) {

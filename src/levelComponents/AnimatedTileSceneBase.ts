@@ -22,8 +22,7 @@ export class AnimatedTileSceneBase extends Phaser.Scene {
 
         for (let tileid in tileData) {
             this.map.layers.forEach(layer => {
-                if (layer.tilemapLayer.type !== "StaticTilemapLayer") {
-
+                if (layer.tilemapLayer.type === "DynamicTilemapLayer") {
                     layer.data.forEach(tileRow => {
                         this.makeAnimationForRow(tileRow, tileid);
                     });

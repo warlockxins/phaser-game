@@ -1,17 +1,16 @@
-export type TilesetTileData = {[key: number]: { animation?: TileAnimationData }};
+export type TilesetTileData = { [key: number]: { animation?: TileAnimationData } };
 
 export type TileAnimationData = Array<{ duration: number, tileid: number }>;
 
 export class AnimatedTile {
-  
+
   private tile: Phaser.Tilemaps.Tile;
   private tileAnimationData: TileAnimationData;
-  private firstgid: number; 
+  private firstgid: number;
   private elapsedTime: number;
   private animationDuration: number;
 
-  constructor(tile: Phaser.Tilemaps.Tile, tileAnimationData: TileAnimationData, firstgid: number)
-  {
+  constructor(tile: Phaser.Tilemaps.Tile, tileAnimationData: TileAnimationData, firstgid: number) {
     this.tile = tile;
     this.tileAnimationData = tileAnimationData;
     this.firstgid = firstgid;
@@ -19,8 +18,7 @@ export class AnimatedTile {
     this.animationDuration = tileAnimationData[0].duration * tileAnimationData.length;
   }
 
-  public update(delta: number): void
-  {
+  public update(delta: number): void {
     this.elapsedTime += delta;
     this.elapsedTime %= this.animationDuration;
 
