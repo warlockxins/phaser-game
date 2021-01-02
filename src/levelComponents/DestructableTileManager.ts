@@ -1,14 +1,23 @@
 import { DestructableTile } from "./DestructableTile";
 
+const COIN_BOX = 3;
+const WOODEN_CRATE = 2;
+
 const DESTRUCTABLE_IDS = [
-    3, // [?]
-    7  // animated eye
+    COIN_BOX,
+    WOODEN_CRATE
 ]
+
+const conBoxFrame = 'coin box';
+const woodenCrateBox = 'wooden crate';
+
+const animationFrames = {
+    [COIN_BOX]: conBoxFrame,
+    [WOODEN_CRATE]: woodenCrateBox
+}
 
 const destructableId = 'destructableId';
 
-const textureFrame = 'destrucrable Frame';
-const textureFrame2 = 'destrucrable Frame2';
 
 export class DestructableTileManager {
     private tiles: Map<string, DestructableTile> = new Map();
@@ -28,11 +37,11 @@ export class DestructableTileManager {
 
         const tileTexture: Phaser.Textures.Texture = scene.textures.list["tiles"];
         tileTexture.add(textureName, 0, 60, 0, 30, 30);
-        tileTexture.add(textureFrame2, 0, 180, 0, 30, 30);
+        tileTexture.add(woodenCrateBox, 0, 30, 0, 30, 30);
 
         this.group = scene.add.group({
             defaultKey: textureName,
-            defaultFrame: textureFrame,
+            defaultFrame: conBoxFrame,
             maxSize: 10,
             createCallback: (block) => {
                 block.setOrigin(0, 0);
@@ -71,7 +80,6 @@ export class DestructableTileManager {
         // now block logic
         destructable.hit(1);
         if (destructable.lives <= 0) {
-            console.log('show sparks');
             this.tiles.delete(id);
             return true;
         }
@@ -84,13 +92,13 @@ export class DestructableTileManager {
 
         tile.setVisible(false);
 
-        // const cropRec: Phaser.Geom.Rectangle = new Phaser.Geom.Rectangle(tile.index * tile.width, 0, tile.width, tile.height);
-        // debugger;
         const sp = sprite
             .setActive(true)
             .setVisible(true)
             .setTint(Phaser.Display.Color.RandomRGB().color)
-            .setFrame(textureFrame2)
+            .setFrame(
+                animationFrames[tile.index]
+            )
 
 
         this.scene.tweens.add({

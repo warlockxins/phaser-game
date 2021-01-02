@@ -12,6 +12,8 @@ import { platformerInputBot } from "../scriptComponent/platformerInputBot";
 import { AnimatedTileSceneBase } from "../levelComponents/AnimatedTileSceneBase";
 import { DestructableTileManager } from "~/levelComponents/DestructableTileManager";
 
+const debreeFrame = 'debreeFrame';
+
 export class GameScene extends AnimatedTileSceneBase {
     movingSprites!: Phaser.Physics.Arcade.Group;
     playerBulletGroup!: Phaser.Physics.Arcade.Group;
@@ -19,6 +21,8 @@ export class GameScene extends AnimatedTileSceneBase {
     instantKillLayer!: Phaser.Tilemaps.StaticTilemapLayer;
 
     destructableTileManager!: DestructableTileManager;
+
+    particles!: Phaser.GameObjects.Particles.ParticleEmitterManager;
 
     constructor() {
         super({
@@ -48,6 +52,14 @@ export class GameScene extends AnimatedTileSceneBase {
         );
 
         this.createCollectables();
+        this.createDebreeFrame();
+    }
+
+    createDebreeFrame() {
+        const tileTexture: Phaser.Textures.Texture = this.textures.list["tiles"];
+        tileTexture.add(debreeFrame, 0, 30, 5, 15, 15);
+
+        this.particles = this.add.particles('tiles');
     }
 
     createCollectables() {
@@ -96,7 +108,26 @@ export class GameScene extends AnimatedTileSceneBase {
                 const tileDestroyed = this.destructableTileManager.trigger((<Phaser.Tilemaps.Tile><unknown>_c2));
                 if (tileDestroyed) {
                     const { pixelY, pixelX } = (<Phaser.Tilemaps.Tile><unknown>_c2);
-                    console.log('====> sparks at', pixelX, pixelY);
+                    const offset = (<Phaser.Tilemaps.Tile><unknown>_c2).width / 2;
+
+                    const emitter = this.particles.createEmitter({
+                        frame: 'debreeFrame',
+                        x: pixelX + offset,
+                        y: pixelY + offset,
+                        lifespan: 2000,
+                        maxParticles: 5,
+                        speedY: { min: -100, max: -150 },
+                        speedX: { min: -100, max: 100 },
+                        angle: { min: -85, max: -95 },
+                        rotate: { min: -180, max: 180 },
+                        gravityY: 400,
+                        quantity: 5,
+                        frequency: 1,
+                    });
+
+                    this.time.delayedCall(2000, () => {
+                        this.particles.removeEmitter(emitter);
+                    });
                 }
             }
         );
