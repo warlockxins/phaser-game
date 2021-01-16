@@ -6,18 +6,11 @@ import { ScriptComponent } from "../scriptComponent/scriptComponent";
 import { DamageController } from './DamageController';
 
 import { Bullet } from "./Bullet";
+import { ControllableCharacter, MoveDirection } from './interfaces';
 
-interface MoveDirection {
-    left: boolean;
-    right: boolean;
-    up: boolean;
-    down: boolean;
-    fire: boolean;
-}
-
-export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
+export class SlimegCharacterSprite extends Phaser.GameObjects.Container implements ControllableCharacter {
     direction: MoveDirection;
-    scriptComponents: ScriptComponent[];
+    scriptComponents: ScriptComponent[] = [];
     body!: Phaser.Physics.Arcade.Body;
     stateMachine!: StateMachine;
 
@@ -28,13 +21,12 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
     health = 3;
     damageController: DamageController;
 
-    blinkTween = undefined;
+    blinkTween: Phaser.Tweens.Tween;
 
     constructor(
         scene: Phaser.Scene,
         x: number,
-        y: number,
-        scriptComponents: ScriptComponent[]
+        y: number
     ) {
         super(scene, x, y);
         scene.sys.updateList.add(this);
@@ -71,17 +63,15 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container {
             fire: false
         };
 
-        this.scriptComponents = scriptComponents;
-
-        this.scriptComponents.forEach((component) => {
-            component.start(scene, this);
-        });
-
         this.stateMachine = new SlimegStateMachine(this);
         this.createText();
 
         this.damageController = new DamageController(this);
 
+    }
+
+    addScriptComponent(item: ScriptComponent) {
+        this.scriptComponents.push(item);
     }
 
     createText() {

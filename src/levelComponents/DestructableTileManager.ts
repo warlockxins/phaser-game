@@ -92,10 +92,9 @@ export class DestructableTileManager {
 
         tile.setVisible(false);
 
-        const sp = sprite
+        sprite
             .setActive(true)
             .setVisible(true)
-            .setTint(Phaser.Display.Color.RandomRGB().color)
             .setFrame(
                 animationFrames[tile.index]
             )

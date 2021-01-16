@@ -6,9 +6,8 @@ import { CST } from "../constants/CST";
 import { addAnimation, SlimegCharacterSprite } from "../Sprite";
 import { ANIMATIONS } from "../animation";
 
-import { ScriptComponent } from "../scriptComponent/scriptComponent";
-import { platformerInput } from "../scriptComponent/platformerInput";
-import { platformerInputBot } from "../scriptComponent/platformerInputBot";
+import { PlatformerInput } from "../scriptComponent/PlayerInput";
+import { PlatformerInputAgent } from "../scriptComponent/PlatformerInputAgent";
 import { AnimatedTileSceneBase } from "../levelComponents/AnimatedTileSceneBase";
 import { DestructableTileManager } from "~/levelComponents/DestructableTileManager";
 
@@ -40,7 +39,10 @@ export class GameScene extends AnimatedTileSceneBase {
     create() {
         this.addGroups();
         this.addLevel();
+        addAnimation(this, ANIMATIONS.slimeg);
+
         this.addPlayer();
+        this.addBot();
         this.setupPhysics();
         this.setupDamageBlock();
         this.createAnimatedTiles();
@@ -146,17 +148,37 @@ export class GameScene extends AnimatedTileSceneBase {
             return;
         }
 
-        const components: ScriptComponent[] = [platformerInput];
-        addAnimation(this, ANIMATIONS.slimeg);
         this.slime = new SlimegCharacterSprite(
             this,
             startPoint.x || 0,
-            startPoint.y || 0,
-            components
+            startPoint.y || 0
         );
+
+        const platformerInput = new PlatformerInput(this, this.slime);
+        this.slime.addScriptComponent(platformerInput)
 
         this.cameras.main.startFollow(this.slime, true, 0.1, 0.1);
         this.movingSprites.add(this.slime);
+    }
+
+    addBot() {
+        const startPoint = this.getLogicObject('start');
+
+        if (!startPoint) {
+            return;
+        }
+
+        const bot = new SlimegCharacterSprite(
+            this,
+            startPoint.x || 0,
+            startPoint.y || 0
+        );
+
+        bot.addScriptComponent(
+            new PlatformerInputAgent(this, bot)
+        )
+
+        this.movingSprites.add(bot);
     }
 
     addDeathZones(x: number = 0, y: number = 0, w: number = 0, h: number = 0) {
