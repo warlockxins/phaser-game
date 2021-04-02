@@ -10,6 +10,7 @@ import { PlatformerInput } from "../scriptComponent/PlayerInput";
 import { PlatformerInputAgent } from "../scriptComponent/PlatformerInputAgent";
 import { AnimatedTileSceneBase } from "../levelComponents/AnimatedTileSceneBase";
 import { DestructableTileManager } from "~/levelComponents/DestructableTileManager";
+import { NavMesh } from "~/levelComponents/NavMesh";
 
 const debreeFrame = 'debreeFrame';
 
@@ -20,6 +21,7 @@ export class GameScene extends AnimatedTileSceneBase {
     instantKillLayer!: Phaser.Tilemaps.StaticTilemapLayer;
 
     destructableTileManager!: DestructableTileManager;
+    navMesh!: NavMesh;
 
     particles!: Phaser.GameObjects.Particles.ParticleEmitterManager;
 
@@ -42,7 +44,6 @@ export class GameScene extends AnimatedTileSceneBase {
         addAnimation(this, ANIMATIONS.slimeg);
 
         this.addPlayer();
-        this.addBot();
         this.setupPhysics();
         this.setupDamageBlock();
         this.createAnimatedTiles();
@@ -55,6 +56,7 @@ export class GameScene extends AnimatedTileSceneBase {
 
         this.createCollectables();
         this.createDebreeFrame();
+        this.addBot();
     }
 
     createDebreeFrame() {
@@ -66,6 +68,7 @@ export class GameScene extends AnimatedTileSceneBase {
 
     createCollectables() {
         this.destructableTileManager = new DestructableTileManager(this.map, this.topLayer, 'tiles', this);
+        this.navMesh = new NavMesh(this.map, this.topLayer);
     }
 
     addGroups() {
@@ -174,8 +177,11 @@ export class GameScene extends AnimatedTileSceneBase {
             startPoint.y || 0
         );
 
+        const botAgent = new PlatformerInputAgent(this, bot);
+        botAgent.setTarget(this.slime);
+
         bot.addScriptComponent(
-            new PlatformerInputAgent(this, bot)
+            botAgent
         )
 
         this.movingSprites.add(bot);

@@ -1,5 +1,5 @@
 export class Bullet extends Phaser.GameObjects.Container {
-    constructor (scene: Phaser.Scene, x: number, y: number, xDir: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number, xDir: number) {
         super(scene, x, y);
         const bullet = scene.add.graphics({ fillStyle: { color: 0x00ff00 }, lineStyle: { color: 0x00aa00 });
         const circle = new Phaser.Geom.Circle(0, 0, 5);
@@ -11,7 +11,7 @@ export class Bullet extends Phaser.GameObjects.Container {
 
         this.setDepth(10);
 
-        this.timer =  setTimeout(() => {
+        this.timer = setTimeout(() => {
             this.destroy();
             this.timer = null;
         }, 2000);

@@ -26,7 +26,6 @@ export class DestructableTileManager {
 
     constructor(tilemap: Phaser.Tilemaps.Tilemap, tileLayer: Phaser.Tilemaps.DynamicTilemapLayer, textureName: string, scene: Phaser.Scene) {
         this.scene = scene;
-
         const destructableTiles = tilemap.filterTiles((tile: Phaser.Tilemaps.Tile) => {
             return DESTRUCTABLE_IDS.includes(tile.index);
         }, undefined, undefined, undefined, undefined, undefined, { isNotEmpty: true }, tileLayer);
@@ -73,6 +72,7 @@ export class DestructableTileManager {
             return false;
         }
 
+        // still playing animation, or destroyed
         if (destructable.tweenIndex !== -1 || destructable.lives <= 0) {
             return false;
         }

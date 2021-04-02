@@ -99,9 +99,9 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container implemen
         this.text.setVisible(false);
     }
 
-    handleScriptComponents() {
+    handleScriptComponents(delta) {
         this.scriptComponents.forEach((component) => {
-            component.update(this);
+            component.update(delta);
         });
     }
 
@@ -149,7 +149,7 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container implemen
     }
 
     preUpdate(time: number, delta: number) {
-        this.handleScriptComponents();
+        this.handleScriptComponents(delta);
         this.stateMachine.update(delta);
     }
 }

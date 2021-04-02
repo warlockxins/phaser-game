@@ -22,7 +22,7 @@
          "name":"bottom",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":224,
          "x":0,
          "y":0
@@ -73,8 +73,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":3329.58551238821,
-                 "y":447.350846796657
+                 "x":758.119541123003,
+                 "y":494.264942237209
                 }, 
                 {
                  "gid":3,
@@ -169,7 +169,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }],
