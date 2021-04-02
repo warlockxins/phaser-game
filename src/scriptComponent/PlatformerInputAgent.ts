@@ -66,7 +66,9 @@ export class PlatformerInputAgent implements ScriptComponent {
         this.resetTimer += delta;
         if (this.resetTimer > resetInterval) {
             this.resetTimer = 0;
-            this.calculatePathToTarget();
+            if (this.gameObject.body.velocity.y === 0) {
+                this.calculatePathToTarget();
+            }
         }
 
         if (this.currentSelectedPath.length === 0) {
@@ -79,8 +81,10 @@ export class PlatformerInputAgent implements ScriptComponent {
         this.gameObject.direction.right = this.gameObject.body.position.x < nextPathPoint.x;
         this.gameObject.direction.left = this.gameObject.body.position.x > nextPathPoint.x;
 
-        this.gameObject.direction.up = Math.abs(this.gameObject.body.position.y - nextPathPoint.y) > 40;
+        // Todo  - figure out > 45 difference for jump
+        this.gameObject.direction.up = Math.abs(this.gameObject.body.position.y - nextPathPoint.y) > 45;
 
+        // console.log(Math.abs(this.gameObject.body.position.y + 60 - nextPathPoint.y));
         if (Math.abs(this.gameObject.body.position.x - nextPathPoint.x) < 30) {
             this.currentSelectedPath.shift()
         }

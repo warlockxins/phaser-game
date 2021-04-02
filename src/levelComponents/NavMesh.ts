@@ -2,7 +2,7 @@ export class NavMesh {
     mesh: { columns: {}; vertices: Map<any, any>; edges: {}; };
     constructor(tilemap: Phaser.Tilemaps.Tilemap, tileLayer: Phaser.Tilemaps.DynamicTilemapLayer) {
         // get collidable tiles in range for path finding
-        const tilesInRect = tilemap.getTilesWithin(0, 0, 100, 50, { isNotEmpty: true, isColliding: true }, tileLayer).map(({ pixelX, pixelY }) => {
+        const tilesInRect = tilemap.getTilesWithin(0, 0, 200, 200, { isNotEmpty: true, isColliding: true }, tileLayer).map(({ pixelX, pixelY }) => {
             return { x: pixelX, y: pixelY }
         });
 
