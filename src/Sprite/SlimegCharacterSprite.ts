@@ -53,7 +53,8 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container implemen
         });
 
         scene.physics.world.enableBody(this);
-        this.body.setMaxVelocity(180, 280);
+        // this.body.setMaxVelocity(180, 280);
+        this.body.setMaxVelocity(150, 280);
 
         this.direction = {
             left: false,

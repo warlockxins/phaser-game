@@ -16,7 +16,7 @@ class PathTableItem {
 }
 
 export class PathPlanner {
-    unvisited: [];
+    unvisited: string[];
     vertexes: any;
     edges: any;
     pathTable: {};
@@ -84,9 +84,9 @@ export class PathPlanner {
         });
     }
 
-    pickNextVertexKey() {
+    pickNextVertexKey(): string | undefined {
         let smallest = Number.POSITIVE_INFINITY;
-        let cheapCostKey = undefined;
+        let cheapCostKey: string | undefined = undefined;
 
         this.unvisited.forEach((vertexKey) => {
             if (this.visited.indexOf(vertexKey) === -1) {
@@ -110,9 +110,9 @@ export class PathPlanner {
         }
     }
 
-    extractPath(to) {
+    extractPath(to: string) {
         let currentNode = to;
-        const path = [];
+        const path: string[] = [];
 
         while (currentNode) {
             path.push(currentNode);
@@ -128,7 +128,7 @@ export class PathPlanner {
      * @param {string} to
      * @returns 
      */
-    execute(from, to) {
+    execute(from: string, to: string) {
         const fromNode = this.vertexes.get(from);
         if (!fromNode) {
             return [];
@@ -136,13 +136,13 @@ export class PathPlanner {
 
         let counter = 0;
         this.resetPathTable(from);
-        let currentNode = from;
+        let currentNode: string | undefined = from;
         this.unvisited.push(from);
 
         while (currentNode) {
             counter++;
             if (currentNode === to) {
-                console.log('======Counter', counter);
+                // console.log('======Counter', counter);
                 return this.extractPath(to);
             }
 

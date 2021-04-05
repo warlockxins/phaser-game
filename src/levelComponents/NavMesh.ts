@@ -6,9 +6,9 @@ export class NavMesh {
             return { x: pixelX, y: pixelY }
         });
 
-        console.time('points');
+        // console.time('points');
         this.mesh = pointsToTable(tilesInRect);
-        console.timeEnd('points');
+        // console.timeEnd('points');
     }
 }
 
@@ -73,11 +73,20 @@ function pointsToTable(points) {
                         const fromVertexKey = `${keys[index]}:${curY}`;
                         const toVertexKey = `${checkColumnKey}:${posBelow.y}`;
                         const diagonalCost = 1;
-                        // jump down is possible = add to edges
+                        // jump down is possible = add to points && edges
+                        // debugger
+                        const wayPointVertexNameToJumpUp = `${checkColumnKey}:${curY}`;
+                        vertices.set(wayPointVertexNameToJumpUp, { x: +checkColumnKey, y: +curY });
+
+                        // jump down
                         connectHorizontalTiles(edges, fromVertexKey, toVertexKey, diagonalCost);
 
+
                         // Todo calculate if can jump up a tile (jump height dependency)
-                        connectHorizontalTiles(edges, toVertexKey, fromVertexKey, diagonalCost);
+                        // first jump to empty waypoint then minair to other point on ground
+                        connectHorizontalTiles(edges, toVertexKey, wayPointVertexNameToJumpUp, 1);
+                        connectHorizontalTiles(edges, wayPointVertexNameToJumpUp, fromVertexKey, 1);
+
                     }
                 }
             }
