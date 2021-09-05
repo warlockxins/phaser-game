@@ -69,6 +69,12 @@ export class GameScene extends AnimatedTileSceneBase {
     createCollectables() {
         this.destructableTileManager = new DestructableTileManager(this.map, this.topLayer, 'tiles', this);
         this.navMesh = new NavMesh(this.map, this.topLayer);
+        const graphics = this.add.graphics({ fillStyle: { color: 0x00ff00 }, lineStyle: { color: 0x0000ff} });
+
+        this.navMesh.mesh.vertices.forEach((item) => {
+            const circle = new Phaser.Geom.Circle(item.x,  item.y, 3);
+            graphics.fillCircleShape(circle);
+        });
     }
 
     addGroups() {

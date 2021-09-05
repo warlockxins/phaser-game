@@ -1,7 +1,7 @@
 import { ControllableCharacter, ScriptComponent } from "~/Sprite/interfaces";
 import { PathPlanner } from '../levelComponents/PathPlanner';
 
-const resetInterval = 500;
+const resetInterval = 200;
 
 type Point = {
     x: number, y: number
@@ -56,53 +56,29 @@ export class PlatformerInputAgent implements ScriptComponent {
         const from = this.gameObject.body.position;
         const to = this.targetObject.body.position;
         const dist = this.calculateDistance(from, to);
-        if (dist < 40) return NavigationState.ARRIVED;
+        if (dist < 30) return NavigationState.ARRIVED;
 
-        // hack
-        // from.x += 10;
-        from.y += 60;
-        const fromPosition = vectorToNavMeshNodePosition(from, 30, 30);
+        const {findPointNear} = this.scene.navMesh;
+        const start = this.scene.navMesh.findPointNear(from.x, from.y);
+        const destination = this.scene.navMesh.findPointNear(to.x, to.y);
 
-        // hack
-        to.y += 60;
-        const toPosition = vectorToNavMeshNodePosition(to, 30, 30);
+        if (!start || !destination) {
+          return NavigationState.NOT_FOUND;
+        }
 
-
-        const { vertices, edges } = this.scene.navMesh.mesh;
+        const { vertices, edges, columns } = this.scene.navMesh.mesh;
         const planner = new PathPlanner(vertices, edges); //new PathPlanner(vertices, edges);
-
-        const result: Point[] = planner.execute(PointToKey(fromPosition), PointToKey(toPosition));
-        if (result.length > 0) {
-            this.currentSelectedPath = result.map(({ x, y }) => ({
-                x: x + 15,
-                y: y
-            }));
-
+        this.currentSelectedPath = planner.execute(PointToKey(start), PointToKey(destination));
+        if (this.currentSelectedPath.length > 0) {
             this.createPathDebugSpline();
         }
 
-        return NavigationState.ARRIVED
+        return NavigationState.FOUND;
     }
 
     calculateDistance(fromNode, toNode) {
         return Math.sqrt(Math.pow((fromNode.x - toNode.x), 2) + Math.pow((fromNode.y - toNode.y), 2));
     }
-
-    deleteClosestPoints() {
-        // cleanup points that are close ... from end
-        let current = - 1;
-        for (let i = this.currentSelectedPath.length - 1; i > -1; i--) {
-            if (this.calculateDistance(this.gameObject.body.position, this.currentSelectedPath[i]) < 35) {
-                current = i;
-                break
-            }
-        }
-        if (current > -1) {
-            this.currentSelectedPath.splice(0, current + 1);
-            this.createPathDebugSpline()
-        }
-    }
-
 
     update(delta: number) {
         this.resetTimer += delta;
@@ -111,7 +87,7 @@ export class PlatformerInputAgent implements ScriptComponent {
             this.calculatePathToTarget();
         }
 
-        this.deleteClosestPoints();
+        this.createPathDebugSpline();
 
         if (this.currentSelectedPath.length === 0) {
             this.gameObject.direction.up = false;
@@ -124,29 +100,26 @@ export class PlatformerInputAgent implements ScriptComponent {
 
         const nextPathPoint = this.currentSelectedPath[0];
 
-        if (this.calculateDistance(nextPathPoint, this.gameObject.body.position) < 40) {
-            this.gameObject.direction.right = false;
-            this.gameObject.direction.left = false;
-            return
-        }
+        const pos = this.gameObject.body.position;
+        const target = this.scene.navMesh.findPointNear(pos.x, pos.y);
 
-        this.gameObject.direction.right = this.gameObject.body.position.x < nextPathPoint.x;
-        this.gameObject.direction.left = this.gameObject.body.position.x > nextPathPoint.x;
+        this.gameObject.direction.right = target.x < nextPathPoint.x;
+        this.gameObject.direction.left = target.x > nextPathPoint.x;
 
-        if (this.gameObject.body.position.y - nextPathPoint.y >= 40) {
+        if (target.y - nextPathPoint.y >= 30) {
             this.gameObject.direction.up = true;
         }
+
+//      the waypoint on the ground below is reached. Delete
+        if (this.calculateDistance(nextPathPoint, target) < 30) {
+            this.currentSelectedPath.shift();
+        }
+
+
+        
     }
     destroy() { }
 };
-
-function vectorToNavMeshNodePosition(v: { x: number, y: number }, tileWidth: number, tileHeight: number): Point {
-    const x = Math.floor(v.x / tileWidth) * tileWidth;
-    const y = Math.floor(v.y / tileHeight) * tileHeight;
-    return {
-        x, y
-    }
-}
 
 function PointToKey(p: Point) {
     return `${p.x}:${p.y}`;

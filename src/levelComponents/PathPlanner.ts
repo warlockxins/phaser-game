@@ -77,7 +77,7 @@ export class PathPlanner {
 
             const cost = distFrom + edge.cost;
 
-            if (elementTo.cost > cost) {
+            if (elementTo?.cost > cost) {
                 elementTo.cost = cost;
                 elementTo.from = currentNode;
             }
@@ -89,7 +89,8 @@ export class PathPlanner {
         let cheapCostKey: string | undefined = undefined;
 
         this.unvisited.forEach((vertexKey) => {
-            if (this.visited.indexOf(vertexKey) === -1) {
+            const currentItem = this.pathTable[vertexKey];
+            if (currentItem && this.visited.indexOf(vertexKey) === -1) {
                 const { cost, heuristic } = this.pathTable[vertexKey];
                 const itemCostWithHeuristic = cost + heuristic;
 
