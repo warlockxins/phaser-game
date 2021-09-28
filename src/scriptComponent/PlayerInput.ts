@@ -1,19 +1,17 @@
-import { ControllableCharacter, ScriptComponent } from "~/Sprite/interfaces";
+import { ControllableCharacter, ScriptComponent, MoveDirection } from "~/Sprite/interfaces";
 
 export class PlatformerInput implements ScriptComponent {
     keyboard;
-    gameObject: ControllableCharacter;
+    direction: MoveDirection;
 
     constructor(scene: Phaser.Scene, gameObject: ControllableCharacter) {
-        this.gameObject = gameObject;
         this.keyboard = scene.input.keyboard.addKeys("W, A, S, D, Space");
+        this.direction = gameObject.direction;
     }
     update() {
-        this.gameObject.direction.left = this.keyboard.A.isDown;
-        this.gameObject.direction.right = this.keyboard.D.isDown;
-        this.gameObject.direction.up = this.keyboard.W.isDown;
-
-        this.gameObject.direction.fire = this.keyboard.Space.isDown;
+        this.direction.fire = this.keyboard.Space.isDown;
+        this.direction.x = this.keyboard.A.isDown ? -1 : 0 + this.keyboard.D.isDown ? 1 : 0;
+        this.direction.y = this.keyboard.W.isDown ? 1 : 0;
     }
     destroy() { }
 };

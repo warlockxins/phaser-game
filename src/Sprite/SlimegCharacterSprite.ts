@@ -53,16 +53,13 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container implemen
         });
 
         scene.physics.world.enableBody(this);
-        // this.body.setMaxVelocity(180, 280);
         this.body.setMaxVelocity(150, 280);
 
         this.direction = {
-            left: false,
-            right: false,
-            up: false,
-            down: false,
-            fire: false
-        };
+            fire: false,
+            x: 0,
+            y: 0
+        }
 
         this.stateMachine = new SlimegStateMachine(this);
         this.createText();
@@ -101,9 +98,9 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container implemen
     }
 
     handleScriptComponents(delta) {
-        this.scriptComponents.forEach((component) => {
-            component.update(delta);
-        });
+        for (let i = 0; i < this.scriptComponents.length; ++i) {
+            this.scriptComponents[i].update(delta) ;
+        }
     }
 
     kill() {
@@ -115,11 +112,13 @@ export class SlimegCharacterSprite extends Phaser.GameObjects.Container implemen
     }
 
     addWalkSpeed(increase: number) {
-        if (this.direction.left) {
-            this.body.velocity.x -= increase;
+        if (this.direction.x < 0) {
+//            this.body.velocity.x -= increase;
+            this.body.velocity.x -= 100;
             this.sprite.flipX = false;
-        } else if (this.direction.right) {
-            this.body.velocity.x += increase;
+        } else if (this.direction.x > 0) {
+//            this.body.velocity.x += increase;
+            this.body.velocity.x = 100;
             this.sprite.flipX = true;
         }
     }

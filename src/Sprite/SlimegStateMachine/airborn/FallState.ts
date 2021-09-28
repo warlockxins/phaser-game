@@ -1,38 +1,29 @@
 import { IStateMachineState } from "../../../stateMachine/interfaces";
 import { SlimegCharacterSprite } from "../../SlimegCharacterSprite";
 
+const FALL_AFTER_MILISECONDS = 2000;
+
 export class FallState implements IStateMachineState {
     slimeg: SlimegCharacterSprite;
-    fallDeath: boolean = false;
-    timer: number | undefined;
+    timer: number = 0;
 
     constructor(slimeg: SlimegCharacterSprite) {
         this.slimeg = slimeg;
     }
+
     enter(): void {
         this.slimeg.sprite.anims.play("stand", false);
-        this.slimeg.text.setText("falling");
-
-        this.fallDeath = false;
-
-        this.timer = setTimeout(() => {
-            this.fallDeath = true;
-            this.timer = undefined;
-        }, 2000);
-
+        this.timer = 0;
     }
+
     update(deltaTime: number): void {
         this.slimeg.addWalkSpeed(0.3 * deltaTime);
+        this.timer += deltaTime;
     }
+
     exit(): void {
-        if (this.fallDeath === true) {
+        if (this.timer > FALL_AFTER_MILISECONDS) {
             this.slimeg.addDamage(1);
         }
-
-        if (this.timer) {
-            clearTimeout(this.timer);
-        }
-
-        this.timer = undefined;
     }
 }

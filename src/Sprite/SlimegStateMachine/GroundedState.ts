@@ -49,7 +49,7 @@ export class GroundedState implements IStateMachineState {
     }
 
     update(deltaTime: number): void {
-        if (this.slimeg.direction.up) {
+        if (this.slimeg.direction.y > 0) {
             this.slimeg.jump();
         }
 

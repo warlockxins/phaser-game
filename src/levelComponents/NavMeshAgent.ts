@@ -11,6 +11,6 @@ export class NavMeshAgent {
         console.time('--- Path find');
         const planner = new PathPlanner(vertices, edges); //new PathPlanner(vertices, edges);
         const result = planner.execute(start, end)
-        console.log('---->', result)
+        console.log('---->', result);
     }
 }

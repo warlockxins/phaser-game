@@ -8,7 +8,6 @@ export class StandState implements IStateMachineState {
     }
     enter(): void {
         this.slimeg.sprite.anims.play("stand", true);
-        this.slimeg.text.setText("standing");
     }
     update(deltaTime: number): void {
         this.slimeg.addWalkSpeed(deltaTime);

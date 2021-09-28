@@ -5,11 +5,9 @@ export interface ScriptComponent {
 
 
 export interface MoveDirection {
-    left: boolean;
-    right: boolean;
-    up: boolean;
-    down: boolean;
     fire: boolean;
+    x: number;
+    y: number;
 }
 
 export interface ControllableCharacter {

@@ -29,7 +29,7 @@ export class NavMesh {
         // console.timeEnd('points');
     }
 
-  findPointNear(x, y) {
+  findWayPointBelow(x, y) {
     const meshX = Math.round(x/this.stepX) * this.stepX + this.stepX/2;
     const meshY = Math.round(y/this.stepY) * this.stepY + this.stepY/2;
     if(!this.mesh.columns[meshX]) {

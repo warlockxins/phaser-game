@@ -9,7 +9,6 @@ export class JumpState implements IStateMachineState {
     enter(): void {
         //  this.slimeg.body.setVelocityY(-350);
         this.slimeg.sprite.anims.stop();
-        this.slimeg.text.setText("jumping");
     }
     update(deltaTime: number): void {
         this.slimeg.addWalkSpeed(0.3 * deltaTime);
