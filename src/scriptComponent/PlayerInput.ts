@@ -1,7 +1,7 @@
 import { ControllableCharacter, ScriptComponent, MoveDirection } from "~/Sprite/interfaces";
 
 export class PlatformerInput implements ScriptComponent {
-    keyboard;
+    keyboard: { Space: { isDown: boolean; }; A: { isDown: boolean; }; D: { isDown: boolean; }; W: { isDown: boolean; }; };
     direction: MoveDirection;
 
     constructor(scene: Phaser.Scene, gameObject: ControllableCharacter) {
@@ -10,7 +10,7 @@ export class PlatformerInput implements ScriptComponent {
     }
     update() {
         this.direction.fire = this.keyboard.Space.isDown;
-        this.direction.x = this.keyboard.A.isDown ? -1 : 0 + this.keyboard.D.isDown ? 1 : 0;
+        this.direction.x = this.keyboard.A.isDown ? -1 : 0 + (this.keyboard.D.isDown ? 1 : 0);
         this.direction.y = this.keyboard.W.isDown ? 1 : 0;
     }
     destroy() { }
